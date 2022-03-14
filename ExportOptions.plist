@@ -6,6 +6,15 @@
 	<true/>
 	<key>destination</key>
 	<string>export</string>
+	<key>manifest</key>
+	<dict>
+		<key>appURL</key>
+		<string>https://bdtapp.github.io/BostonDogTOR.ipa</string>
+		<key>displayImageURL</key>
+		<string>https://bdtapp.github.io/57.jpg</string>
+		<key>fullSizeImageURL</key>
+		<string>https://bdtapp.github.io/512.jpg</string>
+	</dict>
 	<key>method</key>
 	<string>ad-hoc</string>
 	<key>signingStyle</key>
