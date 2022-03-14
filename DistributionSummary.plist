@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BostonDogTOR.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>1</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>1F24C3CADAAF35A4FF4259D22F7401E6CCA13E10</string>
+				<key>dateExpires</key>
+				<string>3/14/23</string>
+				<key>type</key>
+				<string>Cloud Managed Apple Distribution</string>
+			</dict>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>TUPUVKZ22A.ephemeral.distribution.BostonDogTOR</string>
+				<key>aps-environment</key>
+				<string>production</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>TUPUVKZ22A</string>
+				<key>get-task-allow</key>
+				<false/>
+			</dict>
+			<key>name</key>
+			<string>BostonDogTOR.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>bed64fd7-70ba-44f1-a7ea-e9bd96983494</string>
+				<key>dateExpires</key>
+				<string>3/14/23</string>
+				<key>name</key>
+				<string>iOS Team Ad Hoc Provisioning Profile: ephemeral.distribution.BostonDogTOR</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>TUPUVKZ22A</string>
+				<key>name</key>
+				<string>Tauseef Pirzada</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>8.0</string>
+		</dict>
+	</array>
+</dict>
+</plist>
