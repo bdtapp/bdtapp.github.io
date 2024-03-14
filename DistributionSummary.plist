@@ -14,11 +14,11 @@
 			<key>certificate</key>
 			<dict>
 				<key>SHA1</key>
-				<string>4C79A1A28FD91474A98BFEEC01EBFE514F86181A</string>
+				<string>FEA2FD2C93C6DC0B04A7545CB2F1C60FFA4F9991</string>
 				<key>dateExpires</key>
-				<string>3/13/24</string>
+				<string>3/14/25</string>
 				<key>type</key>
-				<string>Apple Distribution</string>
+				<string>Cloud Managed Apple Distribution</string>
 			</dict>
 			<key>entitlements</key>
 			<dict>
@@ -36,9 +36,9 @@
 			<key>profile</key>
 			<dict>
 				<key>UUID</key>
-				<string>c7fd4c8b-1a89-4357-adb2-515bead02713</string>
+				<string>114bf4e1-42ce-46f7-a5dd-680a0af61a82</string>
 				<key>dateExpires</key>
-				<string>3/13/24</string>
+				<string>3/14/25</string>
 				<key>name</key>
 				<string>iOS Team Ad Hoc Provisioning Profile: ephemeral.distribution.BostonDogTOR</string>
 			</dict>
