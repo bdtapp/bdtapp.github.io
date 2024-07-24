@@ -16,7 +16,7 @@
 		<string>https://bdtapp.github.io/512.jpg</string>
 	</dict>
 	<key>method</key>
-	<string>ad-hoc</string>
+	<string>debugging</string>
 	<key>signingStyle</key>
 	<string>automatic</string>
 	<key>stripSwiftSymbols</key>
