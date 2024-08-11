@@ -1,0 +1,18 @@
+1.0
+Core app functionality and UI complete
+Will add rooms later on
+
+1.01
+Allowing entry editing
+
+1.02
+Fixed bug with search not showing edit entry icon in inactive
+inactive now shows total count of entries
+active no longer displays a check cleared/total entries
+removed some redundant code
+Page for room count added
+New favicon added
+Removed redundant old images
+
+1.03
+Placed rooms before tasks

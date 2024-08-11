@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>New</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="images/checklist-2.png">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <link rel="stylesheet" href="createnew.css">
+
+</head>
+
+<body>
+    <div class="wrapper">
+        <form action="javascript:window.Reload()">
+            <div class="custom-header">
+                <a href="active.html">
+                    <i class="fa-solid fa-heart fa-2xl unselected"></i>
+                </a>
+                <a href="inactive.html">
+                    <i class="fa-solid fa-ban fa-2xl unselected"></i>
+                </a>
+                <a href="rooms.html">
+                    <i class="fa-solid fa-door-closed fa-2xl unselected"></i>
+                </a>
+                <a href="tasks.html">
+                    <i class="fa-solid fa-list-check fa-2x unselected"></i>
+                </a>
+                
+                <a href="logs.html">
+                    <i class="fa-solid fa-clipboard fa-2xl unselected"></i>
+                </a>
+                <a href="createnew.html">
+                    <i class="fa-solid fa-pen fa-2x selected"></i>
+                </a>
+
+
+            </div>
+            <div class="input-field">
+                <input type="text" id="date" readonly>
+            </div>
+            <div class="input-field">
+                <input type="text" required id="owner">
+                <label>Owner's Name</label>
+            </div>
+            <div class="input-field">
+                <input type="text" required id="name">
+                <label>Name</label>
+            </div>
+            <div class="input-field">
+                <input type="text" required id="sex" placeholder="M/F" onkeypress="return isNumberKey(event)">
+                <label>Sex</label>
+            </div>
+            <div class="forget">
+
+                <p>Sterile?</p>
+                <input type="checkbox" id="sterile">
+
+
+            </div>
+            <div class="input-field">
+                <input type="number" required step="1" min="0" max="20" id="age">
+                <label>Age</label>
+            </div>
+            <div class="input-field">
+                <input type="number" required step="0.5" min="0.5" max="5" id="quantity">
+                <label>Food quantity</label>
+            </div>
+            <button type="submit">Confirm</button>
+        </form>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        localStorage.setItem("redirect", "createnew.html");
+        function isNumberKey(evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode;
+            if ((charCode == 70 || charCode == 77))
+                return true;
+
+            return false;
+        }
+    </script>
+    <script src="checkkey.js"></script>
+    <script type="module" src="firebaseloader.js"></script>
+    <script type="module" src="firebasecreatenew.js"></script>
+    <script type="module">
+        import { CreateNewEntry } from "./firebasecreatenew.js";
+
+        function Reload() {
+
+            CreateNewEntry();
+
+        }
+
+        window.Reload = Reload;
+    </script>
+</body>
+
+</html>
+

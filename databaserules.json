@@ -1,0 +1,54 @@
+{
+    "rules": {
+        ".read": "false",
+        ".write": "false",
+        "D6kPBRlzczaIMQl09h4WnMzGbcq2": {
+            ".read": "false",
+            ".write": "false",
+            "internal": {
+                ".read": "true",
+                ".write": "false",
+                "Active": {
+                    ".read": "true",
+                    ".write": "false",
+                    "$uid": {
+                        ".read": "true",
+                        ".write": "true"
+                    }
+                },
+                "Inactive": {
+                    ".read": "true",
+                    ".write": "false",
+                    "$uid": {
+                        ".read": "true",
+                        ".write": "true"
+                    }
+                },
+                "Logs": {
+                    ".read": "true",
+                    ".write": "false",
+                    "$uid": {
+                        ".read": "true",
+                        ".write": "true"
+                    }
+                },
+                "Tasks": {
+                    ".read": "true",
+                    ".write": "false",
+                    "$uid": {
+                        ".read": "true",
+                        ".write": "true"
+                    }
+                },
+                "Rooms": {
+                    ".read": "true",
+                    ".write": "false",
+                    "$uid": {
+                        ".read": "true",
+                        ".write": "true"
+                    }
+                },
+            }
+        }
+    }
+}

@@ -1,0 +1,67 @@
+/* Container for the listbox and navigation box */
+body {
+    background: radial-gradient(ellipse farthest-corner at center top, #f39264 0%, #f2606f 100%);
+    color: #fff;
+    font-family: "Nunito", sans-serif;  
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Navigation box above the listbox */
+.nav-box {
+    width: 100%;
+    max-width: 430px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    gap: 30px;
+}
+
+/* Listbox */
+.listbox {
+    width: 100%;
+    min-width: 430px;
+    min-height: 405px;
+    max-width: 430px;
+    max-height: 405px;
+    overflow-y: auto;
+    border: 1px solid #ffffff;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* List items */
+.listbox-item {
+    padding: 1px;
+    border-bottom: 1px solid #eee;
+}
+
+.nav-box .selected {
+    color: #264653;
+}
+
+.nav-box .unselected {
+    transition: color 0.3s ease;
+    color: #ffffff;
+}
+
+.nav-box .special-check {
+    cursor: pointer;
+    transition: color 0.3s ease;
+    color: #63E7BE;
+}
+
+.nav-box .special-check:hover {
+    color: #264653;
+}
+
+.nav-box .unselected:hover {
+    color: #264653;
+}
