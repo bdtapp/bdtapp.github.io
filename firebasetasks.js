@@ -77,16 +77,18 @@ addEventListener("DOMContentLoaded", (event) => {
         ul.classList.add("expanded");
 
         snapshot.forEach((child) => {
+            ++total;
+            ++outof;
             let childkey = child.key;
 
 
             let cleared = false;
             let task = "";
             child.forEach((inner) => {
-                ++total;
+                
                 if (inner.key === "cleared") {
                     cleared = inner.val();
-                    ++outof;
+                    --outof;
                 }
 
                 if (inner.key === "task") {
@@ -144,10 +146,11 @@ addEventListener("DOMContentLoaded", (event) => {
             li.setAttribute("id", "li" + e.key);
 
             ul.appendChild(li);
-            document.getElementById("outoftotal").innerHTML = outof+"/"+total;
+            
         })
         base.appendChild(ul);
         parent.appendChild(base);
+        document.getElementById("outoftotal").innerHTML = outof + "/" + total;
         ul.scrollTo({
             top: topscroll,
             left: 0,
