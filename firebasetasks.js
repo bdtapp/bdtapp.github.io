@@ -78,7 +78,6 @@ addEventListener("DOMContentLoaded", (event) => {
 
         snapshot.forEach((child) => {
             ++total;
-            ++outof;
             let childkey = child.key;
 
 
@@ -88,7 +87,7 @@ addEventListener("DOMContentLoaded", (event) => {
                 
                 if (inner.key === "cleared") {
                     cleared = inner.val();
-                    --outof;
+                    ++outof;
                 }
 
                 if (inner.key === "task") {
