@@ -47,12 +47,12 @@ export const DisableClear = (e) => {
     let path = GetPathForNode(e).path;
     update(ref(db, path), { cleared: false });
 }
-export const RemoveFromActive = (e)=>{
+export const RemoveFromActive = (e) => {
     topscroll = e.parentNode.parentNode.scrollTop;
 
     let obj = GetPathForNode(e);
     set(ref(db, obj.path), null);
-        
+
 }
 addEventListener("DOMContentLoaded", (event) => {
 
@@ -84,10 +84,12 @@ addEventListener("DOMContentLoaded", (event) => {
             let cleared = false;
             let task = "";
             child.forEach((inner) => {
-                
+
                 if (inner.key === "cleared") {
                     cleared = inner.val();
-                    ++outof;
+                    if (cleared) {
+                        ++outof;
+                    }
                 }
 
                 if (inner.key === "task") {
@@ -114,7 +116,7 @@ addEventListener("DOMContentLoaded", (event) => {
             bs.classList.add("fa-solid");
             bs.classList.add("fa-trash");
             bs.classList.add("fa-xl");
-            bs.onclick = function(){
+            bs.onclick = function () {
                 RemoveFromActive(this);
             }
             inpute.setAttribute("type", "checkbox");
@@ -145,7 +147,7 @@ addEventListener("DOMContentLoaded", (event) => {
             li.setAttribute("id", "li" + e.key);
 
             ul.appendChild(li);
-            
+
         })
         base.appendChild(ul);
         parent.appendChild(base);
