@@ -61,7 +61,8 @@ addEventListener("DOMContentLoaded", (event) => {
 
     const activeref = ref(db, key + "/Tasks");
     onValue(activeref, (snapshot) => {
-
+        let total = 0;
+        let outof = 0;
         let container = [];
 
         const parent = document.getElementById("content");
@@ -82,8 +83,10 @@ addEventListener("DOMContentLoaded", (event) => {
             let cleared = false;
             let task = "";
             child.forEach((inner) => {
+                ++total;
                 if (inner.key === "cleared") {
                     cleared = inner.val();
+                    ++outof;
                 }
 
                 if (inner.key === "task") {
@@ -141,6 +144,7 @@ addEventListener("DOMContentLoaded", (event) => {
             li.setAttribute("id", "li" + e.key);
 
             ul.appendChild(li);
+            document.getElementById("outoftotal").innerHTML = outof+"/"+total;
         })
         base.appendChild(ul);
         parent.appendChild(base);
