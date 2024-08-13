@@ -13,7 +13,8 @@ function GetPathForNode(e) {
   return {
     path: keypath,
     id: key,
-    name: parent.getAttribute("name")
+    name: parent.getAttribute("name"),
+    owner: parent.getAttribute("owner"),
   };
 }
 
@@ -84,7 +85,8 @@ function GetPathForeInactive(e) {
   return {
     path: keypath,
     id: key,
-    name: parent.getAttribute("name")
+    name: parent.getAttribute("name"),
+    owner: parent.getAttribute("owner")
   };
 }
 export const RemoveFromActive = (e) => {
@@ -114,6 +116,7 @@ export const RemoveFromActive = (e) => {
         count: counter,
         active: false,
         date: date.toString(),
+        owner: obj.owner,
         timestamp: date.toLocaleString()
       });
       obj = GetPathForeInactive(e);
@@ -263,6 +266,7 @@ export const LocalCachePull = (searchstring) => {
       li.setAttribute("idforpath", e.key);
       li.setAttribute("id", "li" + e.key);
       li.setAttribute("name", e.name);
+      li.setAttribute("owner",e.owner);
       if (e.out) {
         li.classList.add("--out");
         ps.style.setProperty("color", "#bc6c25");
@@ -272,7 +276,7 @@ export const LocalCachePull = (searchstring) => {
         fs.style.setProperty("color", "#B197FC");
       }
       if (e.out && e.fed) {
-        //cleared = true;
+        e.cleared = true;
       }
       if (e.cleared) {
         li.classList.add("--cleared");
@@ -437,6 +441,7 @@ addEventListener("DOMContentLoaded", (event) => {
       li.setAttribute("idforpath", e.key);
       li.setAttribute("id", "li" + e.key);
       li.setAttribute("name", e.name);
+      li.setAttribute("owner",e.owner);
       if (e.out) {
         li.classList.add("--out");
         ps.style.setProperty("color", "#bc6c25");
@@ -446,7 +451,7 @@ addEventListener("DOMContentLoaded", (event) => {
         fs.style.setProperty("color", "#B197FC");
       }
       if (e.out && e.fed) {
-        //cleared = true;
+        e.cleared = true;
       }
       if (e.cleared) {
         li.classList.add("--cleared");

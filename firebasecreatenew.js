@@ -54,7 +54,7 @@ if(editkey==="foo"){
 }
 function InternalCreateNewEntry(ownername,name,sex,sterile,age,foodquantity,uuid,date){
     let path = dbpath + "/Inactive/" + uuid;
-    set(ref(db, path), {
+    update(ref(db, path), {
         name: name,
         owner: ownername,
         steril: sterile,
@@ -64,8 +64,27 @@ function InternalCreateNewEntry(ownername,name,sex,sterile,age,foodquantity,uuid
         key: uuid,
         date: date
     }).then(e => {
-        window.location.href = "./createnew.html";
-        localStorage.setItem("editkey", "foo");
+        
+        
+        onValue(ref(db,dbpath+"/Inactive/"+uuid),snapshot=>{
+            snapshot.forEach(e=>{
+                if(e.key==="active"){
+                    if(e.val()===true){
+                        update(ref(db,dbpath+"/Active/"+uuid),{
+                            name:name,
+                            owner:ownername,
+                            quantity:foodquantity,
+                            
+                        }).then(e=>{
+                            localStorage.setItem("editkey", "foo");
+                            console.log("success");
+                            window.location.href = "./createnew.html";
+                        })
+                    }
+                }
+            })
+        });
+
     }).catch(e => {
 
     });

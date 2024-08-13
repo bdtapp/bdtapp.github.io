@@ -5,11 +5,6 @@ let totalcount = 0;
 
 let dbkey = localStorage.getItem("dbpath");
 
-onValue(ref(db, dbkey +"/Inactive/16805692"), snapshot => {
-    console.log(snapshot.val());
-}, { onlyOnce: true });
-
-
 function GetPathForNode(e) {
     let parent = e.parentNode;
 
@@ -20,7 +15,8 @@ function GetPathForNode(e) {
     return {
         path: keypath,
         id: key,
-        name: parent.getAttribute("name")
+        name: parent.getAttribute("name"),
+        owner: parent.getAttribute("owner")
     };
 }
 function GetPathForNodeActive(e) {
@@ -33,12 +29,14 @@ function GetPathForNodeActive(e) {
     return {
         path: keypath,
         id: key,
-        name: parent.getAttribute("name")
+        name: parent.getAttribute("name"),
+        owner: parent.getAttribute("owner"),
     };
 }
 export const Reactivate = (e) => {
     topscroll = e.parentNode.parentNode.scrollTop;
     let obj = GetPathForNode(e);
+    let parentnode = e.parentNode;
     //set their active value to false in /Inactive
 
     update(ref(db, obj.path), {
@@ -65,13 +63,13 @@ export const Reactivate = (e) => {
             let logpath = path + "/Logs/" + uuid;
             let date = new Date(Date.now());
             let ts = date.getMonth() + "-" + date.getDay() + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-
             set(ref(db, logpath), {
                 key: obj.id,
                 name: obj.name,
                 count: counter,
                 active: true,
                 date: date.toString(),
+                owner:obj.owner,
                 timestamp: date.toLocaleString()
             });
         }, {
@@ -247,6 +245,7 @@ addEventListener("DOMContentLoaded", (event) => {
                 }
                 if (inner.key === "active") {
                     active = inner.val();
+
                 }
                 if(inner.key === "owner"){
                     owner = inner.val();
@@ -315,7 +314,9 @@ addEventListener("DOMContentLoaded", (event) => {
                 bs.style.setProperty("color", "#023047");
                 inpute.checked = true;
             }
+            if (e.active) {
 
+            }
             li.appendChild(inpute);
             labele.innerHTML = e.name + "<br>" + e.owner; 
             labele.appendChild(spane);
@@ -328,7 +329,7 @@ addEventListener("DOMContentLoaded", (event) => {
             li.setAttribute("idforpath", e.key);
             li.setAttribute("id", "li" + e.key);
             li.setAttribute("name", e.name);
-
+            li.setAttribute("owner",e.owner);
 
             ul.appendChild(li);
         })

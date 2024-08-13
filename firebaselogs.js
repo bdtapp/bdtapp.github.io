@@ -31,6 +31,7 @@ addEventListener("DOMContentLoaded", (event) => {
             let timestamp = "";
             let name = "";
             let date = "";
+            let owner = "";
             child.forEach((inner) => {
                 if (inner.key === "count") {
                     count = inner.val();
@@ -47,6 +48,9 @@ addEventListener("DOMContentLoaded", (event) => {
                 if(inner.key === "date"){
                     date = inner.val();
                 }
+                if(inner.key === "owner"){
+                    owner = inner.val();
+                }
 
             });
 
@@ -56,7 +60,8 @@ addEventListener("DOMContentLoaded", (event) => {
                 active: active,
                 date: date,
                 timestamp:timestamp,
-                count:count
+                count:count,
+                owner:owner
             });
         });
 
@@ -76,7 +81,7 @@ addEventListener("DOMContentLoaded", (event) => {
 
                 item.classList.add("listbox-item");
                 let title = document.createElement("h5");
-                title.innerHTML = e.name;
+                title.innerHTML = e.name + " : " + e.owner;
                 let date = document.createElement("p");
                 date.innerHTML = (e.active ? "Arrived" : "Left") + " - count : " + e.count + "<br>" + e.timestamp;
 

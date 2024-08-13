@@ -27,3 +27,13 @@ logo in background
 
 1.06
 More color changes
+
+1.07
+instant scrollibg
+
+1.08
+Changing variables in active if they are edited from inactive
+
+1.09
+Log now shows owner name as well
+Dog gets checked automatically if out and fed
