@@ -265,11 +265,11 @@ export const LocalCachePull = (searchstring) => {
       li.setAttribute("name", e.name);
       if (e.out) {
         li.classList.add("--out");
-        ps.style.setProperty("color", "#583400");
+        ps.style.setProperty("color", "#E37970");
       }
       if (e.fed) {
         li.classList.add("--fed");
-        fs.style.setProperty("color", "#B197FC");
+        fs.style.setProperty("color", "#E37970");
       }
       if (e.out && e.fed) {
         //cleared = true;
@@ -439,11 +439,11 @@ addEventListener("DOMContentLoaded", (event) => {
       li.setAttribute("name", e.name);
       if (e.out) {
         li.classList.add("--out");
-        ps.style.setProperty("color", "#583400");
+        ps.style.setProperty("color", "#E37970");
       }
       if (e.fed) {
         li.classList.add("--fed");
-        fs.style.setProperty("color", "#B197FC");
+        fs.style.setProperty("color", "#E37970");
       }
       if (e.out && e.fed) {
         //cleared = true;

@@ -20,3 +20,7 @@ Placed rooms before tasks
 1.04
 Tasks and inactive have counters
 Owner's names now displayed
+
+1.05
+Change colors for outing
+logo in background
