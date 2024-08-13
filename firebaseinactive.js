@@ -77,7 +77,7 @@ export const LocalCachePull = (searchstring) => {
 
     const activeref = ref(db, key + "/Inactive");
     onValue(activeref, (snapshot) => {
-        
+
         let container = [];
 
         const parent = document.getElementById("content");
@@ -98,6 +98,7 @@ export const LocalCachePull = (searchstring) => {
 
             let active = false;
             let name = "";
+            let owner = "";
             child.forEach((inner) => {
                 if (inner.key === "name") {
                     name = inner.val();
@@ -105,20 +106,25 @@ export const LocalCachePull = (searchstring) => {
                 if (inner.key === "active") {
                     active = inner.val();
                 }
+                if(inner.key === "owner"){
+                    owner = inner.val();
+                }
 
             });
             if (search == "") {
                 container.push({
                     key: childkey,
                     name: name,
-                    active: active
+                    active: active,
+                    owner: owner
                 });
             } else {
                 if (name.includes(search)) {
                     container.push({
                         key: childkey,
                         name: name,
-                        active: active
+                        active: active,
+                        owner: owner
                     });
                 }
             }
@@ -170,7 +176,7 @@ export const LocalCachePull = (searchstring) => {
             }
 
             li.appendChild(inpute);
-            labele.innerHTML = e.name;
+            labele.innerHTML = e.name + "<br>" + e.owner;
             labele.appendChild(spane);
 
             li.append(labele);
@@ -224,6 +230,7 @@ addEventListener("DOMContentLoaded", (event) => {
 
             let active = false;
             let name = "";
+            let owner = "";
             child.forEach((inner) => {
 
                 if (inner.key === "name") {
@@ -232,20 +239,25 @@ addEventListener("DOMContentLoaded", (event) => {
                 if (inner.key === "active") {
                     active = inner.val();
                 }
+                if(inner.key === "owner"){
+                    owner = inner.val();
+                }
 
             });
             if (search == "") {
                 container.push({
                     key: childkey,
                     name: name,
-                    active: active
+                    active: active,
+                    owner: owner
                 });
             } else {
                 if (name.includes(search)) {
                     container.push({
                         key: childkey,
                         name: name,
-                        active: active
+                        active: active,
+                        owner: owner
                     });
                 }
             }
@@ -266,8 +278,8 @@ addEventListener("DOMContentLoaded", (event) => {
             edit.classList.add("fa-solid");
             edit.classList.add("fa-pen");
             edit.classList.add("fa-xl");
-            edit.onclick = function(){
-                localStorage.setItem("editkey",e.key);
+            edit.onclick = function () {
+                localStorage.setItem("editkey", e.key);
                 window.location.href = "createnew.html";
             }
             inpute.setAttribute("type", "checkbox");
@@ -296,7 +308,7 @@ addEventListener("DOMContentLoaded", (event) => {
             }
 
             li.appendChild(inpute);
-            labele.innerHTML = e.name;
+            labele.innerHTML = e.name + "<br>" + e.owner; 
             labele.appendChild(spane);
 
             li.append(labele);

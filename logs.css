@@ -27,9 +27,9 @@ body {
 /* Listbox */
 .listbox {
     width: 100%;
-    min-width: 430px;
+    min-width: 400px;
     min-height: 405px;
-    max-width: 430px;
+    max-width: 400px;
     max-height: 405px;
     overflow-y: auto;
     border: 1px solid #ffffff;

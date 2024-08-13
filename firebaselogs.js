@@ -69,18 +69,23 @@ addEventListener("DOMContentLoaded", (event) => {
             // to get a value that is either negative, positive, or zero.
             return new Date(b.date) - new Date(a.date);
         });
+        let counter = 0;
         container.forEach(e => {
-            let item = document.createElement("div");
+            if(counter <=100){
+                let item = document.createElement("div");
 
-            item.classList.add("listbox-item");
-            let title = document.createElement("h5");
-            title.innerHTML = e.name;
-            let date = document.createElement("p");
-            date.innerHTML = (e.active?"Arrived":"Left") + " - count : "+e.count+"<br>" +e.timestamp ;
+                item.classList.add("listbox-item");
+                let title = document.createElement("h5");
+                title.innerHTML = e.name;
+                let date = document.createElement("p");
+                date.innerHTML = (e.active ? "Arrived" : "Left") + " - count : " + e.count + "<br>" + e.timestamp;
 
-            item.appendChild(title);
-            item.appendChild(date);
-            parent.append(item);
+                item.appendChild(title);
+                item.appendChild(date);
+                parent.append(item);
+                ++counter;
+            }
+
         })
         base.appendChild(parent);
     });

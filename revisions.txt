@@ -16,3 +16,7 @@ Removed redundant old images
 
 1.03
 Placed rooms before tasks
+
+1.04
+Tasks and inactive have counters
+Owner's names now displayed

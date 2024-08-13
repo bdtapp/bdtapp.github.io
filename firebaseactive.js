@@ -157,7 +157,7 @@ export const LocalCachePull = (searchstring) => {
       let fed = false;
       let out = false;
       let name = "";
-
+      let owner = "";
 
       child.forEach((inner) => {
         if (inner.key === "cleared") {
@@ -179,7 +179,9 @@ export const LocalCachePull = (searchstring) => {
         if (inner.key === "name") {
           name = inner.val();
         }
-
+        if(inner.key === "owner"){
+          owner = inner.val();
+        }
       });
       if (search === "") {
         container.push({
@@ -187,7 +189,8 @@ export const LocalCachePull = (searchstring) => {
           name: name,
           fed: fed,
           out: out,
-          cleared: cleared
+          cleared: cleared,
+          owner: owner,
         });
       } else {
         if (name.includes(search)) {
@@ -196,7 +199,8 @@ export const LocalCachePull = (searchstring) => {
             name: name,
             fed: fed,
             out: out,
-            cleared: cleared
+            cleared: cleared,
+            owner: owner
           });
         }
       }
@@ -248,7 +252,7 @@ export const LocalCachePull = (searchstring) => {
       bs.classList.add("fa-xl");
       bs.style.setProperty("color", "#E16972");
       li.appendChild(inpute);
-      labele.innerHTML = e.name;
+      labele.innerHTML = e.name + "<br>" + e.owner;
       labele.appendChild(spane);
 
       li.append(labele);
@@ -324,6 +328,7 @@ addEventListener("DOMContentLoaded", (event) => {
       let fed = false;
       let out = false;
       let name = "";
+      let owner = "";
 
       //just a placeholder 
 
@@ -348,7 +353,9 @@ addEventListener("DOMContentLoaded", (event) => {
         if (inner.key === "name") {
           name = inner.val();
         }
-
+        if(inner.key === "owner"){
+          owner = inner.val();
+        }
       });
       if (search === "") {
         container.push({
@@ -356,7 +363,8 @@ addEventListener("DOMContentLoaded", (event) => {
           name: name,
           fed: fed,
           out: out,
-          cleared: cleared
+          cleared: cleared,
+          owner: owner,
         });
       } else {
         if (name.includes(search)) {
@@ -365,7 +373,8 @@ addEventListener("DOMContentLoaded", (event) => {
             name: name,
             fed: fed,
             out: out,
-            cleared: cleared
+            cleared: cleared,
+            owner: owner
           });
         }
       }
@@ -417,7 +426,7 @@ addEventListener("DOMContentLoaded", (event) => {
       bs.classList.add("fa-xl");
       bs.style.setProperty("color", "#E16972");
       li.appendChild(inpute);
-      labele.innerHTML = e.name;
+      labele.innerHTML = e.name + "<br>" + e.owner;
       labele.appendChild(spane);
 
       li.append(labele);
