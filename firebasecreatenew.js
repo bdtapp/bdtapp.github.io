@@ -81,6 +81,8 @@ function InternalCreateNewEntry(ownername,name,sex,sterile,age,foodquantity,uuid
                             window.location.href = "./createnew.html";
                         })
                     }
+                }else{
+                    window.location.href = "./createnew.html";
                 }
             })
         });

@@ -37,3 +37,6 @@ Changing variables in active if they are edited from inactive
 1.09
 Log now shows owner name as well
 Dog gets checked automatically if out and fed
+
+1.010
+Fixed redirect
