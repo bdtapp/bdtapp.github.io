@@ -288,7 +288,7 @@ export const LocalCachePull = (searchstring) => {
     ul.scrollTo({
       top: topscroll,
       left: 0,
-      behavior: "smooth"
+      behavior: "instant"
     });
   }, {
     onlyOnce: true
@@ -464,7 +464,7 @@ addEventListener("DOMContentLoaded", (event) => {
     ul.scrollTo({
       top: topscroll,
       left: 0,
-      behavior: "smooth"
+      behavior: "instant"
     });
   });
 
