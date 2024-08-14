@@ -61,3 +61,9 @@ Trying to make the app utilise more space
 
 1.017
 Remove giant margin in create new
+
+1.018
+Top margin and displaying name when inactivating
+
+1.019
+favicon

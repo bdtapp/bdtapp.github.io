@@ -80,6 +80,7 @@ textarea {
     text-align: center;
     background-color: transparent;
     gap: 7px;
+    margin-top: 20px;
     margin-bottom: 10px;
     flex-wrap: wrap;
 

@@ -94,7 +94,7 @@ export const RemoveFromActive = (e) => {
 
   let obj = GetPathForNode(e);
   let path = obj.path;
-  if (confirm("Are you sure?") == true) {
+  if (confirm("send "+obj.name+" home?") == true) {
     set(ref(db, path), null);
 
     let uuid = uuidV4();
