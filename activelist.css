@@ -53,11 +53,10 @@ textarea {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 425px;
-    height: 700px;
+    height: 800px;
     
     transition: height 0.3s ease;
     border-radius: 2%;
-
 }
 
 .todoList.expanded {
@@ -68,7 +67,7 @@ textarea {
 /** Header Image **/
 .cover-img .cover-inner {
 
-    height: 190px;
+    height: 100px;
     background-size: cover;
     background-position: 10% 20%;
     border-top-left-radius: 10px;
@@ -80,23 +79,25 @@ textarea {
     align-items: center;
     text-align: center;
     background-color: transparent;
-    gap: 10px;
-    
+    gap: 7px;
     flex-wrap: wrap;
+
 }
 
 .cover-img .cover-inner>* {
     flex: 1 1 15%;
     max-width: 13%;
+
+        /* Reduced bottom margin */
 }
 
 .cover-inner .link {}
 
 
 
-.cover-img .cover-inner h3 {
+.cover-img .cover-inner .hh3 {
     position: absolute;
-    top: 50%;
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-family: "Nunito", sans-serif;
@@ -142,18 +143,21 @@ textarea {
     margin-bottom: 15px;
     padding: 0 10px 0 5px;
     border-bottom: 1px solid #8e979c;
+    
 }
 
 .content form>* {
     background: transparent;
     border: none;
     height: 35px;
+    
 }
 
 .content input[type=text] {
     font-weight: 700;
     font-size: 1.2rem;
     color: #6C717B;
+    width: 100%;
 }
 
 .content .input-buttons a {
@@ -171,7 +175,7 @@ textarea {
     padding: 10px 0 0 0;
 
     list-style: none;
-    height: 375px;
+    height: 540px;
     overflow: auto;
 }
 
@@ -180,11 +184,11 @@ textarea {
     margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
+
 }
 
 .content li label {
     flex-grow: 1;
-
 }
 
 .content li i{

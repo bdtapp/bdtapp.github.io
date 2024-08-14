@@ -127,7 +127,7 @@ export const LocalCachePull = (searchstring) => {
                     owner: owner
                 });
             } else {
-                if (name.includes(search)) {
+                if (name.toLowerCase().includes(search.toLowerCase())) {
                     container.push({
                         key: childkey,
                         name: name,
@@ -261,7 +261,7 @@ addEventListener("DOMContentLoaded", (event) => {
                     owner: owner
                 });
             } else {
-                if (name.includes(search)) {
+                if (name.toLowerCase().includes(search.toLowerCase())) {
                     container.push({
                         key: childkey,
                         name: name,

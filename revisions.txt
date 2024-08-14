@@ -45,4 +45,13 @@ Fixed redirect
 Restoring dog with owner's name
 
 1.012
-Removing logs
+Removing logs (console prints)
+
+1.013
+Minor css changes and case insensitive search
+
+1.014
+Search bar is stretched fully to the container
+
+1.015
+Trying to make the app utilise more space

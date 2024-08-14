@@ -80,13 +80,11 @@ addEventListener("DOMContentLoaded", (event) => {
                 let item = document.createElement("div");
 
                 item.classList.add("listbox-item");
-                let title = document.createElement("h5");
-                title.innerHTML = e.name + " : " + e.owner;
-                let date = document.createElement("p");
-                date.innerHTML = (e.active ? "Arrived" : "Left") + " - count : " + e.count + "<br>" + e.timestamp;
+                let title = document.createElement("p");
+                title.innerHTML = e.name + " : " + e.owner +"<br>"+ (e.active ? "Arrived" : "Left") + " - count : " + e.count + "<br>" + e.timestamp;
 
                 item.appendChild(title);
-                item.appendChild(date);
+
                 parent.append(item);
                 ++counter;
             }

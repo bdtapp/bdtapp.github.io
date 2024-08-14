@@ -8,26 +8,39 @@
 }
 
 body {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    width: 100%;
+    width: 100vw;
     padding: 0 10px;
+    background: radial-gradient(ellipse farthest-corner at center top, #f39264 0%, #f2606f 100%);
 }
 
 body::before {
     content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(ellipse farthest-corner at center top, #f39264 0%, #f2606f 100%);
-    background-position: center;
-    background-size: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('images/bg.jpg');
+        /* Add your transparent image */
+        background-repeat: no-repeat;
+        /* Prevent the image from repeating */
+        background-position: center;
+        /* Center the image */
+        background-size: cover;
+        /* Cover the entire container */
+        opacity: 0.025;
+        /* Set the opacity of the image */
+        z-index: -1;
+        /* Ensure the image is behind any other content */
 }
 
 .wrapper {
-    width: 400px;
+    width: 100w;
     border-radius: 8px;
     padding: 10px;
     text-align: center;
