@@ -43,3 +43,6 @@ Fixed redirect
 
 1.011
 Restoring dog with owner's name
+
+1.012
+Removing logs

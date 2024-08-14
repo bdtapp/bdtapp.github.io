@@ -359,7 +359,6 @@ addEventListener("DOMContentLoaded", (event) => {
         }
         if(inner.key === "owner"){
           owner = inner.val();
-          console.log(owner);
         }
       });
       if (search === "") {
@@ -432,7 +431,6 @@ addEventListener("DOMContentLoaded", (event) => {
       bs.style.setProperty("color", "#E16972");
       li.appendChild(inpute);
       labele.innerHTML = e.name + "<br>" + e.owner;
-      console.log(e.owner);
       labele.appendChild(spane);
 
       li.append(labele);

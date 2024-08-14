@@ -36,7 +36,6 @@ function GetPathForNodeActive(e) {
 export const Reactivate = (e) => {
     topscroll = e.parentNode.parentNode.scrollTop;
     let obj = GetPathForNode(e);
-    console.log(obj.owner);
     let parentnode = e.parentNode;
     //set their active value to false in /Inactive
 
@@ -332,7 +331,6 @@ addEventListener("DOMContentLoaded", (event) => {
             li.setAttribute("id", "li" + e.key);
             li.setAttribute("name", e.name);
             li.setAttribute("owner",e.owner);
-            console.log(e.owner);
 
             ul.appendChild(li);
         })
