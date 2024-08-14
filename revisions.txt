@@ -40,3 +40,6 @@ Dog gets checked automatically if out and fed
 
 1.010
 Fixed redirect
+
+1.011
+Restoring dog with owner's name
