@@ -58,3 +58,6 @@ Trying to make the app utilise more space
 
 1.016
 90% is better
+
+1.017
+Remove giant margin in create new
