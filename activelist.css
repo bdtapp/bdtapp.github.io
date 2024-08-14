@@ -80,6 +80,7 @@ textarea {
     text-align: center;
     background-color: transparent;
     gap: 7px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
 
 }
@@ -157,7 +158,7 @@ textarea {
     font-weight: 700;
     font-size: 1.2rem;
     color: #6C717B;
-    width: 100%;
+    width: 90%;
 }
 
 .content .input-buttons a {
