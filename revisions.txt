@@ -81,3 +81,6 @@ Tasks can only be deleted after being checked off
 Tasks now have a created timestamp anda  completed timestamp
 Tasks completed page 
 Increased visible count for logs and tasks completed to 400
+
+1.12
+Sort completed tasks by completion timestamp
