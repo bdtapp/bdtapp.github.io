@@ -2,7 +2,7 @@
     "rules": {
         ".read": "false",
         ".write": "false",
-        "D6kPBRlzczaIMQl09h4WnMzGbcq2": {
+        "BOSStonDOGtor": {
             ".read": "false",
             ".write": "false",
             "internal": {
@@ -33,6 +33,14 @@
                     }
                 },
                 "Tasks": {
+                    ".read": "true",
+                    ".write": "false",
+                    "$uid": {
+                        ".read": "true",
+                        ".write": "true"
+                    }
+                },
+                "TasksLogs": {
                     ".read": "true",
                     ".write": "false",
                     "$uid": {

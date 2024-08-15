@@ -7,12 +7,12 @@ addEventListener("DOMContentLoaded", (event) => {
     let key = localStorage.getItem("dbpath");
 
 
-    const activeref = ref(db, key + "/Logs");
+    const activeref = ref(db, key + "/TasksLogs");
     onValue(activeref, (snapshot) => {
         let container = [];
 
         let base = document.getElementById("container");
-        base.addEventListener("scroll",(event)=>{
+        base.addEventListener("scroll", (event) => {
             console.log(event);
         })
         let tobedeleted = document.getElementById("container-list");
@@ -26,47 +26,32 @@ addEventListener("DOMContentLoaded", (event) => {
             let childkey = child.key;
 
 
-            let count = 0; 
-            let active = false;
-            let timestamp = "";
-            let name = "";
-            let date = "";
-            let owner = "";
+            let task = "";
+            let completed = "";
+            let created = "";
             child.forEach((inner) => {
-                if (inner.key === "count") {
-                    count = inner.val();
-                }
-                if (inner.key === "timestamp") {
-                    timestamp = inner.val();
-                }
-                if (inner.key === "name") {
-                    name = inner.val();
-                }
-                if (inner.key === "active") {
-                    active = inner.val();
-                }
-                if(inner.key === "date"){
-                    date = inner.val();
-                }
-                if(inner.key === "owner"){
-                    owner = inner.val();
-                }
 
+                if (inner.key==="created"){
+                    created = inner.val();
+                }
+                if (inner.key === "completed") {
+                    completed = inner.val();
+                }
+                if (inner.key === "task") {
+                    task = inner.val();
+                }
             });
 
             container.push({
-                key: childkey,
-                name: name,
-                active: active,
-                date: date,
-                timestamp:timestamp,
-                count:count,
-                owner:owner
+                key:childkey,
+                created:created,
+                task:task,
+                completed:completed
             });
         });
 
         let parent = document.createElement("div");
-        parent.setAttribute("id","container-list");
+        parent.setAttribute("id", "container-list");
         parent.classList.add("listbox");
 
         container.sort(function (a, b) {
@@ -76,12 +61,12 @@ addEventListener("DOMContentLoaded", (event) => {
         });
         let counter = 0;
         container.forEach(e => {
-            if(counter <=400){
+            if (counter <= 400) {
                 let item = document.createElement("div");
 
                 item.classList.add("listbox-item");
                 let title = document.createElement("p");
-                title.innerHTML = e.name + " : " + e.owner +"<br>"+ (e.active ? "Arrived" : "Left") + " - count : " + e.count + "<br>" + e.timestamp;
+                title.innerHTML = e.task + "<br>" + "created : " + e.created + "<br>" + "completed : "+e.completed;
 
                 item.appendChild(title);
 

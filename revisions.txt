@@ -71,3 +71,13 @@ favicon
 1.020
 Logs showing owner properly
 (Bug was I wasn't storing the owner attribute during a search)
+
+1.1
+Stable release
+
+1.11
+Added tasks completed page and taskscompleted js
+Tasks can only be deleted after being checked off
+Tasks now have a created timestamp anda  completed timestamp
+Tasks completed page 
+Increased visible count for logs and tasks completed to 400
