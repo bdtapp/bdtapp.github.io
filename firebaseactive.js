@@ -255,7 +255,9 @@ export const LocalCachePull = (searchstring) => {
       bs.classList.add("fa-xl");
       bs.style.setProperty("color", "#E16972");
       li.appendChild(inpute);
-      labele.innerHTML = e.name + "<br>" + e.owner;
+      let paragraph = document.createElement("p");
+      paragraph.innerHTML = e.name + "<br>" + e.owner;
+      labele.appendChild(paragraph);
       labele.appendChild(spane);
 
       li.append(labele);
@@ -430,7 +432,9 @@ addEventListener("DOMContentLoaded", (event) => {
       bs.classList.add("fa-xl");
       bs.style.setProperty("color", "#E16972");
       li.appendChild(inpute);
-      labele.innerHTML = e.name + "<br>" + e.owner;
+      let paragraph = document.createElement("p");
+      paragraph.innerHTML = e.name + "<br>" + e.owner;
+      labele.appendChild(paragraph);
       labele.appendChild(spane);
 
       li.append(labele);

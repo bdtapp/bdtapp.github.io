@@ -87,3 +87,6 @@ Sort completed tasks by completion timestamp
 
 1.13
 No longer need quantity on create
+
+1.14
+Font and size changes

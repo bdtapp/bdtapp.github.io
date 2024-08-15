@@ -200,7 +200,11 @@ textarea {
     margin-left: auto;
 
 }
+.content li p {
+    font-size: 14px;
+    font-weight: 700;
 
+}
 .content input[type=checkbox] {
     display: none;
 }
