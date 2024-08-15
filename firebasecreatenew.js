@@ -96,7 +96,8 @@ export const CreateNewEntry = ()=>{
     let ownername = document.getElementById("owner").value;
     let sterile = document.getElementById("sterile").checked;
     let age = parseInt(document.getElementById("age").value);
-    let foodquantity = parseFloat(document.getElementById("quantity").value);
+    //let foodquantity = parseFloat(document.getElementById("quantity").value);
+    let foodquantity = 0.0;
     let date = document.getElementById("date").value;
     let sex = document.getElementById("sex").value;
     let uuid = editkey;

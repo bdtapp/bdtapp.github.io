@@ -84,3 +84,6 @@ Increased visible count for logs and tasks completed to 400
 
 1.12
 Sort completed tasks by completion timestamp
+
+1.13
+No longer need quantity on create
