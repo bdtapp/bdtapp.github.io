@@ -194,7 +194,7 @@ export const LocalCachePull = (searchstring) => {
             li.setAttribute("idforpath", e.key);
             li.setAttribute("id", "li" + e.key);
             li.setAttribute("name", e.name);
-
+            li.setAttribute("owner",e.owner);
 
             ul.appendChild(li);
         })

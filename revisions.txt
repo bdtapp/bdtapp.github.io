@@ -67,3 +67,7 @@ Top margin and displaying name when inactivating
 
 1.019
 favicon
+
+1.020
+Logs showing owner properly
+(Bug was I wasn't storing the owner attribute during a search)
