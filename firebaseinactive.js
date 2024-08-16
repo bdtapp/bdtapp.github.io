@@ -155,7 +155,7 @@ export const LocalCachePull = (searchstring) => {
             edit.classList.add("fa-xl");
             edit.onclick = function () {
                 localStorage.setItem("editkey", e.key);
-                window.location.href = "createnew.html";
+                window.location.href = "editentry.html";
             }
 
             inpute.setAttribute("type", "checkbox");
@@ -291,7 +291,7 @@ addEventListener("DOMContentLoaded", (event) => {
             edit.classList.add("fa-xl");
             edit.onclick = function () {
                 localStorage.setItem("editkey", e.key);
-                window.location.href = "createnew.html";
+                window.location.href = "editentry.html";
             }
             inpute.setAttribute("type", "checkbox");
             inpute.setAttribute("id", e.key);

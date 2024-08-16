@@ -90,3 +90,6 @@ No longer need quantity on create
 
 1.14
 Font and size changes
+
+1.15
+Corrected editing entries and creating new entries by using just a separate html file
