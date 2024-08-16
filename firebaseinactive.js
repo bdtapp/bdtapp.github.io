@@ -5,6 +5,7 @@ let totalcount = 0;
 
 let dbkey = localStorage.getItem("dbpath");
 
+
 function GetPathForNode(e) {
     let parent = e.parentNode;
 
@@ -346,6 +347,9 @@ addEventListener("DOMContentLoaded", (event) => {
             left: 0,
             behavior: "instant"
         });
+        document.getElementsByClassName("todos")[0].addEventListener("scroll", (event) => {
+            topscroll = event.target.scrollTop;
+        })  
     });
 
 

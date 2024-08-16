@@ -88,8 +88,12 @@ Sort completed tasks by completion timestamp
 1.13
 No longer need quantity on create
 
-1.14
+1.14e
 Font and size changes
 
 1.15
 Corrected editing entries and creating new entries by using just a separate html file
+
+1.16
+Event handler on scroll
+scrolling back automatically when another user modifies an entry
