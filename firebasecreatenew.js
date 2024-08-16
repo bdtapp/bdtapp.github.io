@@ -29,7 +29,7 @@ if(editkey==="foo"){
 
             }
             if(child.key=="quantity"){
-                document.getElementById("quantity").value = child.val();
+                //document.getElementById("quantity").value = child.val();
 
 
             }
