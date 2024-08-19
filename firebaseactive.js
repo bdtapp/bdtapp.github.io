@@ -3,6 +3,7 @@ const db = getDatabase();
 
 let topscroll = 0;
 
+
 function GetPathForNode(e) {
   let parent = e.parentNode;
 
@@ -94,7 +95,7 @@ export const RemoveFromActive = (e) => {
 
   let obj = GetPathForNode(e);
   let path = obj.path;
-  if (confirm("send "+obj.name+" home?") == true) {
+  if (confirm("send " + obj.name + " home?") == true) {
     set(ref(db, path), null);
 
     let uuid = uuidV4();
@@ -182,7 +183,7 @@ export const LocalCachePull = (searchstring) => {
         if (inner.key === "name") {
           name = inner.val();
         }
-        if(inner.key === "owner"){
+        if (inner.key === "owner") {
           owner = inner.val();
         }
       });
@@ -268,7 +269,7 @@ export const LocalCachePull = (searchstring) => {
       li.setAttribute("idforpath", e.key);
       li.setAttribute("id", "li" + e.key);
       li.setAttribute("name", e.name);
-      li.setAttribute("owner",e.owner);
+      li.setAttribute("owner", e.owner);
       if (e.out) {
         li.classList.add("--out");
         ps.style.setProperty("color", "#bc6c25");
@@ -303,7 +304,22 @@ export const LocalCachePull = (searchstring) => {
 addEventListener("DOMContentLoaded", (event) => {
 
   let key = localStorage.getItem("dbpath");
-
+  let taskspath = key + "/Tasks";
+  onValue(ref(db, taskspath), snapshot => {
+    let unclearedtasks = false;
+    document.getElementById("taskslink").classList.add("unselected");
+    document.getElementById("taskslink").classList.remove("untoggled");
+    snapshot.forEach(child => {
+      let obj = child.val();
+      if (obj.cleared === false) {
+        unclearedtasks = true;
+      }
+    })
+    if (unclearedtasks == true) {
+      document.getElementById("taskslink").classList.remove("unselected");
+      document.getElementById("taskslink").classList.add("untoggled");
+    }
+  });
 
   const activeref = ref(db, key + "/Active");
   onValue(activeref, (snapshot) => {
@@ -341,7 +357,7 @@ addEventListener("DOMContentLoaded", (event) => {
       child.forEach((inner) => {
         if (inner.key === "cleared") {
           cleared = inner.val();
-          
+
         }
         if (inner.key === "fed") {
           fed = inner.val();
@@ -359,7 +375,7 @@ addEventListener("DOMContentLoaded", (event) => {
         if (inner.key === "name") {
           name = inner.val();
         }
-        if(inner.key === "owner"){
+        if (inner.key === "owner") {
           owner = inner.val();
         }
       });
@@ -445,7 +461,7 @@ addEventListener("DOMContentLoaded", (event) => {
       li.setAttribute("idforpath", e.key);
       li.setAttribute("id", "li" + e.key);
       li.setAttribute("name", e.name);
-      li.setAttribute("owner",e.owner);
+      li.setAttribute("owner", e.owner);
       if (e.out) {
         li.classList.add("--out");
         ps.style.setProperty("color", "#bc6c25");
@@ -469,7 +485,7 @@ addEventListener("DOMContentLoaded", (event) => {
     base.appendChild(ul);
 
     parent.appendChild(base);
-    document.getElementById("outoftotal").innerHTML=outof+"/"+totalcount;
+    document.getElementById("outoftotal").innerHTML = outof + "/" + totalcount;
     ul.scrollTo({
       top: topscroll,
       left: 0,
@@ -477,7 +493,7 @@ addEventListener("DOMContentLoaded", (event) => {
     });
     document.getElementsByClassName("todos")[0].addEventListener("scroll", (event) => {
       topscroll = event.target.scrollTop;
-    })  
+    })
   });
 
 

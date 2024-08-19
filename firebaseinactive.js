@@ -215,7 +215,22 @@ export const LocalCachePull = (searchstring) => {
 addEventListener("DOMContentLoaded", (event) => {
 
     let key = localStorage.getItem("dbpath");
-
+    let taskspath = key + "/Tasks";
+    onValue(ref(db, taskspath), snapshot => {
+        let unclearedtasks = false;
+        document.getElementById("taskslink").classList.add("unselected");
+        document.getElementById("taskslink").classList.remove("untoggled");
+        snapshot.forEach(child => {
+            let obj = child.val();
+            if (obj.cleared === false) {
+                unclearedtasks = true;
+            }
+        })
+        if (unclearedtasks == true) {
+            document.getElementById("taskslink").classList.remove("unselected");
+            document.getElementById("taskslink").classList.add("untoggled");
+        }
+    });
 
     const activeref = ref(db, key + "/Inactive");
     onValue(activeref, (snapshot) => {

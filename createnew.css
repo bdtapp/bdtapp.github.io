@@ -15,7 +15,7 @@ body {
     min-height: 100vh;
     width: 100vw;
     padding: 0 10px;
-    background: radial-gradient(ellipse farthest-corner at center top, #f39264 0%, #f2606f 100%);
+    background: radial-gradient(ellipse farthest-corner at center top, #ff9770 0%, #ff70a6 100%);
 }
 
 body::before {
@@ -170,9 +170,16 @@ button:hover {
 .custom-header .selected {
     color: #264653;
 }
-
-
 .custom-header .unselected:hover {
     color: #264653;
 }
 
+.custom-header .untoggled {
+    transition: color 0.3s ease;
+    color: #ce4257;
+}
+
+.custom-header .untoggled:hover {
+    transition: color 0.3s ease;
+    color: #264653;
+}

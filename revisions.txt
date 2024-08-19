@@ -97,3 +97,9 @@ Corrected editing entries and creating new entries by using just a separate html
 1.16
 Event handler on scroll
 scrolling back automatically when another user modifies an entry
+
+1.17
+Incomplete tasks will show tasks icon as distinct color
+
+1.18
+Using local version of bootstrap on login and index
