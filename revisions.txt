@@ -88,7 +88,7 @@ Sort completed tasks by completion timestamp
 1.13
 No longer need quantity on create
 
-1.14e
+1.14
 Font and size changes
 
 1.15
@@ -103,3 +103,6 @@ Incomplete tasks will show tasks icon as distinct color
 
 1.18
 Using local version of bootstrap on login and index
+
+1.19
+Sort by owner

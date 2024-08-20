@@ -2,7 +2,7 @@ import { getDatabase, ref, set, get, onValue, update, child } from "https://www.
 const db = getDatabase();
 
 let topscroll = 0;
-
+let sortbyowner = false;
 
 function GetPathForNode(e) {
   let parent = e.parentNode;
@@ -18,7 +18,14 @@ function GetPathForNode(e) {
     owner: parent.getAttribute("owner"),
   };
 }
-
+export const ToggleSortByOwner = () =>{
+  sortbyowner = !sortbyowner;
+  console.log(sortbyowner);
+  let e = document.getElementById("sortbyowner");
+  e.classList.toggle("sortswapdetoggled");
+  e.classList.toggle("sortswaptoggled");
+  LocalCachePull("");
+}
 export const ToggleFed = (e) => {
   topscroll = e.parentNode.parentNode.scrollTop;
   let path = GetPathForNode(e).path;
@@ -214,7 +221,12 @@ export const LocalCachePull = (searchstring) => {
 
 
     const { compare } = Intl.Collator('en-US');
-    container.sort((a, b) => compare(a.name, b.name));
+    if(sortbyowner===true){
+      container.sort((a, b) => compare(a.owner, b.owner));
+    }else if(sortbyowner===false){
+      container.sort((a, b) => compare(a.name, b.name));
+    }
+    
     container.forEach(e => {
       let li = document.createElement("li");
       let inpute = document.createElement("input");
@@ -406,7 +418,11 @@ addEventListener("DOMContentLoaded", (event) => {
 
 
     const { compare } = Intl.Collator('en-US');
-    container.sort((a, b) => compare(a.name, b.name));
+    if (sortbyowner === true) {
+      container.sort((a, b) => compare(a.owner, b.owner));
+    } else if (sortbyowner === false) {
+      container.sort((a, b) => compare(a.name, b.name));
+    }
     container.forEach(e => {
       let li = document.createElement("li");
       let inpute = document.createElement("input");
