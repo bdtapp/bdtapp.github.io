@@ -18,7 +18,7 @@ function GetPathForNode(e) {
     owner: parent.getAttribute("owner"),
   };
 }
-export const ToggleSortByOwner = () =>{
+export const ToggleSortByOwner = () => {
   sortbyowner = !sortbyowner;
   console.log(sortbyowner);
   let e = document.getElementById("sortbyowner");
@@ -139,176 +139,201 @@ export const RemoveFromActive = (e) => {
 
   }
 }
-export const LocalCachePull = (searchstring) => {
-  let key = localStorage.getItem("dbpath");
 
+function HandleSnapshotContainer(snapshot, search) {
+  let container = [];
+  let totalcount = 0;
+  snapshot.forEach((child) => {
 
-  const activeref = ref(db, key + "/Active");
-  onValue(activeref, (snapshot) => {
-    let container = [];
+    let childkey = child.key;
+    ++totalcount;
 
-    const parent = document.getElementById("content");
-    let tobedeleted = document.getElementById("accordian");
-    if (tobedeleted != null && tobedeleted != undefined) {
-      tobedeleted.remove();
-    }
-    const base = document.createElement("div");
-    base.setAttribute("id", "accordian");
+    let cleared = false;
+    let fed = false;
+    let out = false;
+    let name = "";
+    let owner = "";
 
-    const ul = document.createElement("ul");
-    ul.classList.add("todos");
-    ul.classList.add("expanded");
-
-    let search = searchstring;
-    snapshot.forEach((child) => {
-      let childkey = child.key;
-
-
-      let cleared = false;
-      let fed = false;
-      let out = false;
-      let name = "";
-      let owner = "";
-
-      child.forEach((inner) => {
-        if (inner.key === "cleared") {
-          cleared = inner.val();
-        }
-        if (inner.key === "fed") {
+    child.forEach((inner) => {
+      if (inner.key === "cleared") {
+        cleared = inner.val();
+      }
+      if (inner.key === "fed") {
+        fed = inner.val();
+        if (fed) {
           fed = inner.val();
-          if (fed) {
-            fed = inner.val();
-          }
         }
-        if (inner.key === "out") {
+      }
+      if (inner.key === "out") {
+        out = inner.val();
+        if (out) {
           out = inner.val();
-          if (out) {
-            out = inner.val();
 
-          }
         }
-        if (inner.key === "name") {
-          name = inner.val();
-        }
-        if (inner.key === "owner") {
-          owner = inner.val();
-        }
+      }
+      if (inner.key === "name") {
+        name = inner.val();
+      }
+      if (inner.key === "owner") {
+        owner = inner.val();
+      }
+    });
+    if (search === "") {
+      container.push({
+        key: childkey,
+        name: name,
+        fed: fed,
+        out: out,
+        cleared: cleared,
+        owner: owner,
       });
-      if (search === "") {
+    } else {
+      if (name.toLowerCase().includes(search.toLowerCase())) {
         container.push({
           key: childkey,
           name: name,
           fed: fed,
           out: out,
           cleared: cleared,
-          owner: owner,
+          owner: owner
         });
-      } else {
-        if (name.toLowerCase().includes(search.toLowerCase())) {
-          container.push({
-            key: childkey,
-            name: name,
-            fed: fed,
-            out: out,
-            cleared: cleared,
-            owner: owner
-          });
-        }
       }
-
-
-    });
-
-
-    const { compare } = Intl.Collator('en-US');
-    if(sortbyowner===true){
-      container.sort((a, b) => compare(a.owner, b.owner));
-    }else if(sortbyowner===false){
-      container.sort((a, b) => compare(a.name, b.name));
     }
-    
-    container.forEach(e => {
-      let li = document.createElement("li");
-      let inpute = document.createElement("input");
-      let spane = document.createElement("span");
-      let labele = document.createElement("label");
-      let fs = document.createElement("i");
-      fs.onclick = function () {
-        window.ToggleFed(this);
-      }
-      let ps = document.createElement("i");
-      ps.onclick = function () {
-        window.ToggleOut(this);
-      }
-      let bs = document.createElement("i");
-      bs.onclick = function () {
-        window.RemoveFromActive(this);
-      }
-      inpute.setAttribute("type", "checkbox");
-      inpute.setAttribute("id", e.key);
-      inpute.addEventListener("change", function (event) {
-        if (event.target.checked) {
-          EnableClear(inpute);
-        } else {
-          DisableClear(inpute);
-        }
 
-      });
-      labele.setAttribute("for", e.key);
-      spane.classList.add("check");
 
-      fs.classList.add("fa-solid");
-      fs.classList.add("fa-bowl-rice");
-      fs.classList.add("fa-xl");
-      ps.classList.add("fa-solid");
-      ps.classList.add("fa-poop");
-      ps.classList.add("fa-xl");
-      bs.classList.add("fa-solid");
-      bs.classList.add("fa-ban");
-      bs.classList.add("fa-xl");
-      bs.style.setProperty("color", "#E16972");
-      li.appendChild(inpute);
-      let paragraph = document.createElement("p");
-      paragraph.innerHTML = e.name + "<br>" + e.owner;
-      labele.appendChild(paragraph);
-      labele.appendChild(spane);
+  });
 
-      li.append(labele);
-      li.appendChild(fs);
-      li.appendChild(ps);
-      li.appendChild(bs);
+  return {
+    container: container,
+    totalcount: totalcount,
+  }
+}
 
-      li.setAttribute("idforpath", e.key);
-      li.setAttribute("id", "li" + e.key);
-      li.setAttribute("name", e.name);
-      li.setAttribute("owner", e.owner);
-      if (e.out) {
-        li.classList.add("--out");
-        ps.style.setProperty("color", "#bc6c25");
-      }
-      if (e.fed) {
-        li.classList.add("--fed");
-        fs.style.setProperty("color", "#B197FC");
-      }
-      if (e.out && e.fed) {
-        e.cleared = true;
-      }
-      if (e.cleared) {
-        li.classList.add("--cleared");
-        inpute.checked = true;
+function CreateAndPopulateElements(container, totalcount) {
+  let outof = totalcount
+  const parent = document.getElementById("content");
+  let tobedeleted = document.getElementById("accordian");
+  if (tobedeleted != null && tobedeleted != undefined) {
+    tobedeleted.remove();
+  }
+  const base = document.createElement("div");
+  base.setAttribute("id", "accordian");
+
+  const ul = document.createElement("ul");
+  ul.classList.add("todos");
+  ul.classList.add("expanded");
+
+
+
+
+  const { compare } = Intl.Collator('en-US');
+  if (sortbyowner === true) {
+    container.sort((a, b) => compare(a.owner, b.owner));
+  } else if (sortbyowner === false) {
+    container.sort((a, b) => compare(a.name, b.name));
+  }
+  container.forEach(e => {
+    let li = document.createElement("li");
+    let inpute = document.createElement("input");
+    let spane = document.createElement("span");
+    let labele = document.createElement("label");
+    let fs = document.createElement("i");
+    fs.onclick = function () {
+      window.ToggleFed(this);
+    }
+    let ps = document.createElement("i");
+    ps.onclick = function () {
+      window.ToggleOut(this);
+    }
+    let bs = document.createElement("i");
+    bs.onclick = function () {
+      window.RemoveFromActive(this);
+    }
+    inpute.setAttribute("type", "checkbox");
+    inpute.setAttribute("id", e.key);
+    inpute.addEventListener("change", function (event) {
+      if (event.target.checked) {
+        EnableClear(inpute);
+      } else {
+        DisableClear(inpute);
       }
 
-      ul.appendChild(li);
-    })
-
-    base.appendChild(ul);
-
-    parent.appendChild(base);
-    ul.scrollTo({
-      top: topscroll,
-      left: 0,
-      behavior: "instant"
     });
+    labele.setAttribute("for", e.key);
+    spane.classList.add("check");
+
+    fs.classList.add("fa-solid");
+    fs.classList.add("fa-bowl-rice");
+    fs.classList.add("fa-xl");
+    ps.classList.add("fa-solid");
+    ps.classList.add("fa-poop");
+    ps.classList.add("fa-xl");
+    bs.classList.add("fa-solid");
+    bs.classList.add("fa-ban");
+    bs.classList.add("fa-xl");
+    bs.style.setProperty("color", "#E16972");
+    li.appendChild(inpute);
+    let paragraph = document.createElement("p");
+    paragraph.innerHTML = e.name + "<br>" + e.owner;
+    labele.appendChild(paragraph);
+    labele.appendChild(spane);
+
+    li.append(labele);
+    li.appendChild(fs);
+    li.appendChild(ps);
+    li.appendChild(bs);
+
+    li.setAttribute("idforpath", e.key);
+    li.setAttribute("id", "li" + e.key);
+    li.setAttribute("name", e.name);
+    li.setAttribute("owner", e.owner);
+    if (e.out) {
+      li.classList.add("--out");
+      ps.style.setProperty("color", "#bc6c25");
+    }
+    if (e.fed) {
+      li.classList.add("--fed");
+      fs.style.setProperty("color", "#B197FC");
+    }
+    if (e.out && e.fed) {
+      e.cleared = true;
+    }
+    if (e.cleared) {
+      li.classList.add("--cleared");
+      inpute.checked = true;
+      --outof;
+    }
+
+    ul.appendChild(li);
+  })
+
+  base.appendChild(ul);
+
+  parent.appendChild(base);
+
+  ul.scrollTo({
+    top: topscroll,
+    left: 0,
+    behavior: "instant"
+  });
+  document.getElementsByClassName("todos")[0].addEventListener("scroll", (event) => {
+    topscroll = event.target.scrollTop;
+  })
+
+  return outof;
+}
+export const LocalCachePull = (searchstring) => {
+  let key = localStorage.getItem("dbpath");
+
+
+  const activeref = ref(db, key + "/Active");
+  onValue(activeref, (snapshot) => {
+
+    let search = searchstring;
+    let obj = HandleSnapshotContainer(snapshot, search);
+    let container = obj.container;
+    let totalcount = obj.totalcount;
+    CreateAndPopulateElements(container, totalcount);
   }, {
     onlyOnce: true
   });
@@ -335,181 +360,12 @@ addEventListener("DOMContentLoaded", (event) => {
 
   const activeref = ref(db, key + "/Active");
   onValue(activeref, (snapshot) => {
-    let totalcount = 0;
-    let outof = 0;
-    let container = [];
-
-    const parent = document.getElementById("content");
-    let tobedeleted = document.getElementById("accordian");
-    if (tobedeleted != null && tobedeleted != undefined) {
-      tobedeleted.remove();
-    }
-    const base = document.createElement("div");
-    base.setAttribute("id", "accordian");
-
-    const ul = document.createElement("ul");
-    ul.classList.add("todos");
-    ul.classList.add("expanded");
-
     let search = document.getElementById("searchid").value;
-    snapshot.forEach((child) => {
-      ++totalcount;
-      ++outof;
-      let childkey = child.key;
-
-
-      let cleared = false;
-      let fed = false;
-      let out = false;
-      let name = "";
-      let owner = "";
-
-      //just a placeholder 
-
-      child.forEach((inner) => {
-        if (inner.key === "cleared") {
-          cleared = inner.val();
-
-        }
-        if (inner.key === "fed") {
-          fed = inner.val();
-          if (fed) {
-            fed = inner.val();
-          }
-        }
-        if (inner.key === "out") {
-          out = inner.val();
-          if (out) {
-            out = inner.val();
-
-          }
-        }
-        if (inner.key === "name") {
-          name = inner.val();
-        }
-        if (inner.key === "owner") {
-          owner = inner.val();
-        }
-      });
-      if (search === "") {
-        container.push({
-          key: childkey,
-          name: name,
-          fed: fed,
-          out: out,
-          cleared: cleared,
-          owner: owner,
-        });
-      } else {
-        if (name.toLowerCase().includes(search.toLowerCase())) {
-          container.push({
-            key: childkey,
-            name: name,
-            fed: fed,
-            out: out,
-            cleared: cleared,
-            owner: owner
-          });
-        }
-      }
-
-
-    });
-
-
-    const { compare } = Intl.Collator('en-US');
-    if (sortbyowner === true) {
-      container.sort((a, b) => compare(a.owner, b.owner));
-    } else if (sortbyowner === false) {
-      container.sort((a, b) => compare(a.name, b.name));
-    }
-    container.forEach(e => {
-      let li = document.createElement("li");
-      let inpute = document.createElement("input");
-      let spane = document.createElement("span");
-      let labele = document.createElement("label");
-      let fs = document.createElement("i");
-      fs.onclick = function () {
-        window.ToggleFed(this);
-      }
-      let ps = document.createElement("i");
-      ps.onclick = function () {
-        window.ToggleOut(this);
-      }
-      let bs = document.createElement("i");
-      bs.onclick = function () {
-        window.RemoveFromActive(this);
-      }
-      inpute.setAttribute("type", "checkbox");
-      inpute.setAttribute("id", e.key);
-      inpute.addEventListener("change", function (event) {
-        if (event.target.checked) {
-          EnableClear(inpute);
-        } else {
-          DisableClear(inpute);
-        }
-
-      });
-      labele.setAttribute("for", e.key);
-      spane.classList.add("check");
-
-      fs.classList.add("fa-solid");
-      fs.classList.add("fa-bowl-rice");
-      fs.classList.add("fa-xl");
-      ps.classList.add("fa-solid");
-      ps.classList.add("fa-poop");
-      ps.classList.add("fa-xl");
-      bs.classList.add("fa-solid");
-      bs.classList.add("fa-ban");
-      bs.classList.add("fa-xl");
-      bs.style.setProperty("color", "#E16972");
-      li.appendChild(inpute);
-      let paragraph = document.createElement("p");
-      paragraph.innerHTML = e.name + "<br>" + e.owner;
-      labele.appendChild(paragraph);
-      labele.appendChild(spane);
-
-      li.append(labele);
-      li.appendChild(fs);
-      li.appendChild(ps);
-      li.appendChild(bs);
-
-      li.setAttribute("idforpath", e.key);
-      li.setAttribute("id", "li" + e.key);
-      li.setAttribute("name", e.name);
-      li.setAttribute("owner", e.owner);
-      if (e.out) {
-        li.classList.add("--out");
-        ps.style.setProperty("color", "#bc6c25");
-      }
-      if (e.fed) {
-        li.classList.add("--fed");
-        fs.style.setProperty("color", "#B197FC");
-      }
-      if (e.out && e.fed) {
-        e.cleared = true;
-      }
-      if (e.cleared) {
-        li.classList.add("--cleared");
-        inpute.checked = true;
-        --outof;
-      }
-
-      ul.appendChild(li);
-    })
-
-    base.appendChild(ul);
-
-    parent.appendChild(base);
+    let obj = HandleSnapshotContainer(snapshot, search);
+    let container = obj.container;
+    let totalcount = obj.totalcount;
+    let outof = CreateAndPopulateElements(container,totalcount);
     document.getElementById("outoftotal").innerHTML = outof + "/" + totalcount;
-    ul.scrollTo({
-      top: topscroll,
-      left: 0,
-      behavior: "instant"
-    });
-    document.getElementsByClassName("todos")[0].addEventListener("scroll", (event) => {
-      topscroll = event.target.scrollTop;
-    })
   });
 
 

@@ -106,3 +106,12 @@ Using local version of bootstrap on login and index
 
 1.19
 Sort by owner
+
+1.20
+Cleaned up firebaseactive code
+
+1.21
+Cleaned up firebaseinactive code
+
+1.22
+Each entry can show personal logs
