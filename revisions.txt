@@ -115,3 +115,6 @@ Cleaned up firebaseinactive code
 
 1.22
 Each entry can show personal logs
+
+1.23
+readded bg
