@@ -4,8 +4,8 @@ body {
     min-height: 450px;
     height: 100vh;
     margin: 0;
-    background: radial-gradient(ellipse farthest-corner at center top, #ff9770 0%, #ff70a6 100%);
-    color: #fff;
+    background: radial-gradient(ellipse farthest-corner at center top, #a93f55 0%, #19323c 100%);
+    color: rgb(219, 216, 216);
     font-family: "Nunito", sans-serif;
     overflow: hidden;
 }

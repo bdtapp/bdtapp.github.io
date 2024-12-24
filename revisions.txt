@@ -118,3 +118,7 @@ Each entry can show personal logs
 
 1.23
 readded bg
+
+1.24
+Snowfall css
+food/outing color change

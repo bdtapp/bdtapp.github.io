@@ -293,7 +293,7 @@ function CreateAndPopulateElements(container, totalcount) {
     }
     if (e.fed) {
       li.classList.add("--fed");
-      fs.style.setProperty("color", "#B197FC");
+      fs.style.setProperty("color", "#a8c256");
     }
     if (e.out && e.fed) {
       e.cleared = true;
