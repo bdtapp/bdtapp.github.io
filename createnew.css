@@ -16,6 +16,7 @@ body {
     width: 100vw;
     padding: 0 10px;
     background: radial-gradient(ellipse farthest-corner at center top, #a93f55 0%, #19323c 100%);
+    overflow-x: hidden;
 }
 
 body::before {
