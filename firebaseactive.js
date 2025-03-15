@@ -271,7 +271,7 @@ function CreateAndPopulateElements(container, totalcount) {
     bs.classList.add("fa-solid");
     bs.classList.add("fa-ban");
     bs.classList.add("fa-xl");
-    bs.style.setProperty("color", "#E16972");
+    bs.style.setProperty("color", "hsl(242, 30%, 41%);");
     li.appendChild(inpute);
     let paragraph = document.createElement("p");
     paragraph.innerHTML = e.name + "<br>" + e.owner;
@@ -289,11 +289,11 @@ function CreateAndPopulateElements(container, totalcount) {
     li.setAttribute("owner", e.owner);
     if (e.out) {
       li.classList.add("--out");
-      ps.style.setProperty("color", "#bc6c25");
+      ps.style.setProperty("color", "#ffafcc");
     }
     if (e.fed) {
       li.classList.add("--fed");
-      fs.style.setProperty("color", "#a8c256");
+      fs.style.setProperty("color", "#cdb4db");
     }
     if (e.out && e.fed) {
       e.cleared = true;

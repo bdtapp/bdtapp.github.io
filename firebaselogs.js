@@ -97,7 +97,7 @@ addEventListener("DOMContentLoaded", (event) => {
                 item.classList.add("listbox-item");
                 let title = document.createElement("p");
                 title.innerHTML = e.name + " : " + e.owner +"<br>"+ (e.active ? "Arrived" : "Left") + " - count : " + e.count + "<br>" + e.timestamp;
-
+                title.setAttribute("id",e.key);
                 item.appendChild(title);
 
                 parent.append(item);

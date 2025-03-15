@@ -12,7 +12,7 @@ body {
     min-height: 450px;
     height: 100vh;
     margin: 0;
-    background: radial-gradient(ellipse farthest-corner at center top, #a93f55 0%, #19323c 100%);
+    background: radial-gradient(ellipse farthest-corner at center top, hsl(264, 41%, 62%) 0%,rgb(110, 147, 216));
     color: #fff;
     font-family: "Nunito", sans-serif;
     overflow: hidden;
@@ -112,36 +112,36 @@ textarea {
 }
 
 .cover-img .cover-inner .selected {
-    color: #264653;
+    color: hsl(264, 30%, 41%);
 }
 
 .cover-img .cover-inner .unselected {
     transition: color 0.3s ease;
-    color: #ffffff;
+    color: hsl(0, 0%, 100%);
 }
 
 .cover-img .cover-inner .untoggled {
     transition: color 0.3s ease;
-    color: #ce4257;
+    color: hsl(264, 30%, 41%);
 }
 
 .cover-img .cover-inner .untoggled:hover {
     transition: color 0.3s ease;
-    color: #264653;
+    color: hsl(264, 30%, 41%);
 }
 
 .cover-img .cover-inner .special-check {
     cursor: pointer;
     transition: color 0.3s ease;
-    color: #63E7BE;
+    color: hsl(264, 30%, 41%);
 }
 
 .cover-img .cover-inner .special-check:hover {
-    color: #264653;
+    color: hsl(264, 30%, 41%);
 }
 
 .cover-img .cover-inner .unselected:hover {
-    color: #264653;
+    color: hsl(264, 30%, 41%);
 }
 
 .cover-img .cover-inner .sortswapdetoggled {
@@ -155,12 +155,12 @@ textarea {
     position: absolute;
     left: 5%;
     top: 70%;
-    color: #264653;
+    color: hsl(264, 30%, 41%);
 }
 
 /* Main Content */
 .content {
-    background: #1c1f26;
+    background:hsl(242, 30%, 41%);
     padding: 10px 20px;
     height: calc(100% - 190px);
 }
@@ -220,7 +220,7 @@ textarea {
 }
 
 .content li i {
-    color: #6C717B;
+    color: hsl(244, 32%, 20%);
     cursor: pointer;
     padding: 20px 10px;
     margin-left: auto;
@@ -238,7 +238,7 @@ textarea {
 }
 
 .content input[type=checkbox]+label {
-    color: #6C717B;
+    color: #8798AA;
     font-size: 17px;
     cursor: pointer;
     position: relative;
@@ -248,8 +248,8 @@ textarea {
 }
 
 .content input[type=checkbox]+label:hover {
-    color: #353A42;
-    background-color: #F4F7FA;
+    color: #8798AA;
+    background-color: hsl(263, 31%, 26%);
 }
 
 .content input[type=checkbox]+label span.check {

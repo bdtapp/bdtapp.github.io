@@ -189,12 +189,12 @@ function CreateAndPopulateElements(container) {
             bs.classList.add("fa-ban");
             bs.classList.add("fa-xl");
             //bs.style.setProperty("color", "#63E7BE");
-            bs.style.setProperty("color", "#E16972");
+            bs.style.setProperty("color", "hsl(242, 30%, 41%);");
         } else {
             bs.classList.add("fa-solid");
             bs.classList.add("fa-heart");
             bs.classList.add("fa-xl");
-            bs.style.setProperty("color", "#023047");
+            bs.style.setProperty("color", "#cdb4db");
             inpute.checked = true;
         }
 

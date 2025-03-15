@@ -4,7 +4,7 @@ body {
     min-height: 450px;
     height: 100vh;
     margin: 0;
-    background: radial-gradient(ellipse farthest-corner at center top, #a93f55 0%, #19323c 100%);
+    background: radial-gradient(ellipse farthest-corner at center top, hsl(264, 41%, 62%) 0%, rgb(110, 147, 216));
     color: rgb(219, 216, 216);
     font-family: "Nunito", sans-serif;
     overflow: hidden;
@@ -92,7 +92,7 @@ body::before {
 }
 .nav-box .untoggled {
     transition: color 0.3s ease;
-    color: #ce4257;
+    color: hsl(264, 30%, 41%);
 }
 
 .nav-box .untoggled:hover {
