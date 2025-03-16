@@ -130,3 +130,9 @@ overflow-x hidden on createnew
 1.26
 Color scheme,
 logs show have id tag
+
+1.27
+Color changes
+archiving will write to logs first,
+if succeeds, then it will get removed from active,
+if succeeds, it will display inactive in inactive tab

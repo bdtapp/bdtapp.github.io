@@ -103,7 +103,7 @@ export const RemoveFromActive = (e) => {
   let obj = GetPathForNode(e);
   let path = obj.path;
   if (confirm("send " + obj.name + " home?") == true) {
-    set(ref(db, path), null);
+
 
     let uuid = uuidV4();
     path = localStorage.getItem("dbpath");
@@ -126,11 +126,17 @@ export const RemoveFromActive = (e) => {
         date: date.toString(),
         owner: obj.owner,
         timestamp: date.toLocaleString()
+      }).then(() => {
+        set(ref(db, obj.path), null).then(() => {
+          obj = GetPathForeInactive(e);
+          update(ref(db, obj.path), {
+            active: false
+          }).then(() => {
+            console.log("success\n");
+          });
+        })
       });
-      obj = GetPathForeInactive(e);
-      update(ref(db, obj.path), {
-        active: false
-      });
+
 
     }, {
       onlyOnce: true
@@ -271,7 +277,7 @@ function CreateAndPopulateElements(container, totalcount) {
     bs.classList.add("fa-solid");
     bs.classList.add("fa-ban");
     bs.classList.add("fa-xl");
-    bs.style.setProperty("color", "hsl(242, 30%, 41%);");
+    bs.style.setProperty("color", "#242343");
     li.appendChild(inpute);
     let paragraph = document.createElement("p");
     paragraph.innerHTML = e.name + "<br>" + e.owner;
@@ -364,7 +370,7 @@ addEventListener("DOMContentLoaded", (event) => {
     let obj = HandleSnapshotContainer(snapshot, search);
     let container = obj.container;
     let totalcount = obj.totalcount;
-    let outof = CreateAndPopulateElements(container,totalcount);
+    let outof = CreateAndPopulateElements(container, totalcount);
     document.getElementById("outoftotal").innerHTML = outof + "/" + totalcount;
   });
 
