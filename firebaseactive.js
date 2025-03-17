@@ -271,7 +271,7 @@ function CreateAndPopulateElements(container, totalcount) {
     bs.classList.add("fa-solid");
     bs.classList.add("fa-ban");
     bs.classList.add("fa-xl");
-    bs.style.setProperty("color", "hsl(242, 30%, 41%);");
+    bs.style.setProperty("color", "#242343");
     li.appendChild(inpute);
     let paragraph = document.createElement("p");
     paragraph.innerHTML = e.name + "<br>" + e.owner;
