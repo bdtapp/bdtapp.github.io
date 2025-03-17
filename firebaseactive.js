@@ -103,7 +103,7 @@ export const RemoveFromActive = (e) => {
   let obj = GetPathForNode(e);
   let path = obj.path;
   if (confirm("send " + obj.name + " home?") == true) {
-    set(ref(db, path), null);
+
 
     let uuid = uuidV4();
     path = localStorage.getItem("dbpath");
@@ -126,11 +126,17 @@ export const RemoveFromActive = (e) => {
         date: date.toString(),
         owner: obj.owner,
         timestamp: date.toLocaleString()
+      }).then(() => {
+        set(ref(db, obj.path), null).then(() => {
+          obj = GetPathForeInactive(e);
+          update(ref(db, obj.path), {
+            active: false
+          }).then(() => {
+            console.log("success\n");
+          });
+        })
       });
-      obj = GetPathForeInactive(e);
-      update(ref(db, obj.path), {
-        active: false
-      });
+
 
     }, {
       onlyOnce: true
