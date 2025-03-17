@@ -136,6 +136,3 @@ Color changes
 archiving will write to logs first,
 if succeeds, then it will get removed from active,
 if succeeds, it will display inactive in inactive tab
-
-1.28
-Undoing previous changes because yah..
