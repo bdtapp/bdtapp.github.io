@@ -41,9 +41,10 @@ export const ToggleOut = (e) => {
   topscroll = e.parentNode.parentNode.scrollTop;
   let path = GetPathForNode(e).path;
   if (e.parentNode.classList.contains("--out")) {
-    update(ref(db, path), { out: false });
+    update(ref(db, path), { out: false, currentlyout: false });
+
   } else {
-    update(ref(db, path), { out: true });
+    update(ref(db, path), { out: true, currentlyout: true });
   }
 };
 export const ToggleClear = (e) => {
@@ -54,12 +55,21 @@ export const ToggleClear = (e) => {
 export const EnableClear = (e) => {
   topscroll = e.parentNode.parentNode.scrollTop;
   let path = GetPathForNode(e).path;
-  update(ref(db, path), { cleared: true });
+  if (e.parentNode.classList.contains("--currentlyout")) {
+    update(ref(db, path), { currentlyout: false });
+  } else {
+    update(ref(db, path), { cleared: true, currentlyout: true });
+  }
 }
 export const DisableClear = (e) => {
   topscroll = e.parentNode.parentNode.scrollTop;
   let path = GetPathForNode(e).path;
-  update(ref(db, path), { cleared: false });
+  if (e.parentNode.classList.contains("--currentlyout")) {
+    update(ref(db, path), { currentlyout: false });
+  }else{
+    update(ref(db, path), { cleared: false });
+  }
+  
 }
 export const ResetStates = () => {
 
@@ -151,12 +161,16 @@ function HandleSnapshotContainer(snapshot, search) {
     let cleared = false;
     let fed = false;
     let out = false;
+    let currentlyout = false;
     let name = "";
     let owner = "";
 
     child.forEach((inner) => {
       if (inner.key === "cleared") {
         cleared = inner.val();
+      }
+      if (inner.key == "currentlyout") {
+        currentlyout = inner.val();
       }
       if (inner.key === "fed") {
         fed = inner.val();
@@ -184,8 +198,10 @@ function HandleSnapshotContainer(snapshot, search) {
         name: name,
         fed: fed,
         out: out,
+        currentlyout: currentlyout,
         cleared: cleared,
         owner: owner,
+
       });
     } else {
       if (name.toLowerCase().includes(search.toLowerCase())) {
@@ -194,6 +210,7 @@ function HandleSnapshotContainer(snapshot, search) {
           name: name,
           fed: fed,
           out: out,
+          currentlyout: currentlyout,
           cleared: cleared,
           owner: owner
         });
@@ -274,9 +291,8 @@ function CreateAndPopulateElements(container, totalcount) {
     bs.style.setProperty("color", "#242343");
     li.appendChild(inpute);
     let paragraph = document.createElement("p");
-    paragraph.innerHTML = e.name + "<br>" + e.owner;
-    labele.appendChild(paragraph);
-    labele.appendChild(spane);
+
+
 
     li.append(labele);
     li.appendChild(fs);
@@ -291,6 +307,20 @@ function CreateAndPopulateElements(container, totalcount) {
       li.classList.add("--out");
       ps.style.setProperty("color", "#ffafcc");
     }
+    if (e.currentlyout) {
+      li.classList.add("--currentlyout");
+      paragraph.style.setProperty("color", "#E95262");
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      paragraph.innerHTML = e.name + " " + hours + ":" + minutes + ":" + seconds + "<br>" + e.owner;
+    }
+    else{
+      paragraph.innerHTML = e.name + "<br>" + e.owner;
+    }
+    labele.appendChild(paragraph);
+    labele.appendChild(spane);
     if (e.fed) {
       li.classList.add("--fed");
       fs.style.setProperty("color", "#cdb4db");
@@ -364,7 +394,7 @@ addEventListener("DOMContentLoaded", (event) => {
     let obj = HandleSnapshotContainer(snapshot, search);
     let container = obj.container;
     let totalcount = obj.totalcount;
-    let outof = CreateAndPopulateElements(container,totalcount);
+    let outof = CreateAndPopulateElements(container, totalcount);
     document.getElementById("outoftotal").innerHTML = outof + "/" + totalcount;
   });
 

@@ -89,6 +89,12 @@
         window.RemoveFromActive = RemoveFromActive;
         window.LocalCachePull = LocalCachePull;
         window.ToggleSortByOwner = ToggleSortByOwner;
+
+        let updatemessage = localStorage.getItem("v1.30update");
+        if(updatemessage==null||updatemessage==undefined){
+            //localStorage.setItem("v1.30update","true");
+            //alert("Update: Dog's name appears red when they are let out.\nTap their name again once they are back in");
+        }
     </script>
     <script>
 

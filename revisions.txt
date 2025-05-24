@@ -134,3 +134,7 @@ logs show have id tag
 1.27
 Undoing code changes
 only keeping color changes
+
+1.3
+Dog turns red when out and shows a timestamp next to their name
+Tap the dog again to bring them back in
