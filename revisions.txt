@@ -141,3 +141,9 @@ Tap the dog again to bring them back in
 
 1.31
 timestamp appears under the name and counts up
+
+1.32
+Forgot to add the timestamp to the database
+Don't do counting, just store the time in the database and display it under the name.
+Removing strike through
+Changing color if they are out

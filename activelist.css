@@ -268,7 +268,7 @@ textarea {
 
 .content input[type=checkbox]:checked+label {
     color: #AEB7C6;
-    text-decoration: line-through;
+    
 }
 
 .content input[type=checkbox]:checked+label span.check {

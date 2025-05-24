@@ -3,7 +3,7 @@ const db = getDatabase();
 
 let topscroll = 0;
 let sortbyowner = false;
-
+/*
 setInterval(() => {
   let list = document.getElementsByClassName("currentlyouttimer");
   for (let index = 0; index < list.length; index++) {
@@ -19,12 +19,9 @@ setInterval(() => {
     list[index].innerHTML = ""+h+":"+(m< 10 ? "0"+m : m)+":"+(s< 10 ? "0"+s : s);
   }
 
-/*
-  
-
-  */
 
 }, 100);
+*/
 function GetPathForNode(e) {
   let parent = e.parentNode;
 
@@ -65,7 +62,7 @@ export const ToggleOut = (e) => {
     update(ref(db, path), { out: false, currentlyout: false });
 
   } else {
-    update(ref(db, path), { out: true, currentlyout: true });
+    update(ref(db, path), { out: true, currentlyout: true, currentlyouttimestamp:Date.now() });
   }
 };
 export const ToggleClear = (e) => {
@@ -79,7 +76,7 @@ export const EnableClear = (e) => {
   if (e.parentNode.classList.contains("--currentlyout")) {
     update(ref(db, path), { currentlyout: false });
   } else {
-    update(ref(db, path), { cleared: true, currentlyout: true });
+    update(ref(db, path), { cleared: true, currentlyout: true, currentlyouttimestamp:Date.now() });
   }
 }
 export const DisableClear = (e) => {
@@ -183,12 +180,16 @@ function HandleSnapshotContainer(snapshot, search) {
     let fed = false;
     let out = false;
     let currentlyout = false;
+    let currentlyouttimestamp = 0;
     let name = "";
     let owner = "";
 
     child.forEach((inner) => {
       if (inner.key === "cleared") {
         cleared = inner.val();
+      }
+      if(inner.key == "currentlyouttimestamp"){
+        currentlyouttimestamp = inner.val();
       }
       if (inner.key == "currentlyout") {
         currentlyout = inner.val();
@@ -220,6 +221,7 @@ function HandleSnapshotContainer(snapshot, search) {
         fed: fed,
         out: out,
         currentlyout: currentlyout,
+        currentlyouttimestamp: currentlyouttimestamp,
         cleared: cleared,
         owner: owner,
 
@@ -232,6 +234,7 @@ function HandleSnapshotContainer(snapshot, search) {
           fed: fed,
           out: out,
           currentlyout: currentlyout,
+          currentlyouttimestamp: currentlyouttimestamp,
           cleared: cleared,
           owner: owner
         });
@@ -332,7 +335,7 @@ function CreateAndPopulateElements(container, totalcount) {
     if (e.currentlyout) {
       li.classList.add("--currentlyout");
       //
-      //paragraph.style.setProperty("color", "#E95262");
+      //paragraph.style.setProperty("color", "#1f1f1f");
       const now = new Date();
       const hours = now.getHours();
       const minutes = now.getMinutes();
@@ -342,7 +345,7 @@ function CreateAndPopulateElements(container, totalcount) {
       h5.innerHTML = hours + ":" + minutes + ":" + seconds ;
       h5.style.setProperty("color", "#E95262");
       h5.classList.add("currentlyouttimer");
-      h5.setAttribute("currentlyouttimestamp", Date.now());
+      h5.setAttribute("currentlyouttimestamp", e.currentlyouttimestamp);
       labele.appendChild(paragraph);
       labele.appendChild(h5);
     }
@@ -360,7 +363,9 @@ function CreateAndPopulateElements(container, totalcount) {
       e.cleared = true;
     }
     if (e.cleared) {
+      paragraph.style.setProperty("color","#1f1f1f");
       li.classList.add("--cleared");
+
       inpute.checked = true;
       --outof;
     }
