@@ -4,6 +4,27 @@ const db = getDatabase();
 let topscroll = 0;
 let sortbyowner = false;
 
+setInterval(() => {
+  let list = document.getElementsByClassName("currentlyouttimer");
+  for (let index = 0; index < list.length; index++) {
+    //console.log(list[index].getAttribute("currentlyouttimestamp"));
+    let timestamp = list[index].getAttribute("currentlyouttimestamp");
+    timestamp = parseInt(timestamp);
+    let now = Date.now();
+    let diff = now - timestamp;
+    let seconds = Math.floor(diff / 1000);
+    let h = Math.floor(seconds / 3600);
+    let m = Math.floor(seconds % 3600 / 60);
+    let s = seconds % 60;
+    list[index].innerHTML = ""+h+":"+(m< 10 ? "0"+m : m)+":"+(s< 10 ? "0"+s : s);
+  }
+
+/*
+  
+
+  */
+
+}, 100);
 function GetPathForNode(e) {
   let parent = e.parentNode;
 
@@ -239,6 +260,7 @@ function CreateAndPopulateElements(container, totalcount) {
   const ul = document.createElement("ul");
   ul.classList.add("todos");
   ul.classList.add("expanded");
+  ul.setAttribute("id","accordianlist");
 
 
 
@@ -309,17 +331,26 @@ function CreateAndPopulateElements(container, totalcount) {
     }
     if (e.currentlyout) {
       li.classList.add("--currentlyout");
-      paragraph.style.setProperty("color", "#E95262");
+      //
+      //paragraph.style.setProperty("color", "#E95262");
       const now = new Date();
       const hours = now.getHours();
       const minutes = now.getMinutes();
       const seconds = now.getSeconds();
-      paragraph.innerHTML = e.name + " " + hours + ":" + minutes + ":" + seconds + "<br>" + e.owner;
+      paragraph.innerHTML = e.name + "<br>" + e.owner;
+      let h5 = document.createElement("h5");
+      h5.innerHTML = hours + ":" + minutes + ":" + seconds ;
+      h5.style.setProperty("color", "#E95262");
+      h5.classList.add("currentlyouttimer");
+      h5.setAttribute("currentlyouttimestamp", Date.now());
+      labele.appendChild(paragraph);
+      labele.appendChild(h5);
     }
     else{
       paragraph.innerHTML = e.name + "<br>" + e.owner;
+      labele.appendChild(paragraph);
     }
-    labele.appendChild(paragraph);
+    
     labele.appendChild(spane);
     if (e.fed) {
       li.classList.add("--fed");
