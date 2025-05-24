@@ -201,6 +201,9 @@ function CreateAndPopulateElements(container) {
         li.appendChild(inpute);
         let paragraph = document.createElement("p");
         paragraph.innerHTML = e.name + "<br>" + e.owner;
+        if(e.active){
+            paragraph.style.setProperty("color","#1f1f1f");
+        }
         labele.appendChild(paragraph);
         labele.appendChild(spane);
 

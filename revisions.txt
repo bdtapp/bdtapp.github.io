@@ -147,3 +147,6 @@ Forgot to add the timestamp to the database
 Don't do counting, just store the time in the database and display it under the name.
 Removing strike through
 Changing color if they are out
+
+1.33
+Changing color on inactive to be consistent 
