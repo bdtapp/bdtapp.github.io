@@ -336,7 +336,7 @@ function CreateAndPopulateElements(container, totalcount) {
       li.classList.add("--currentlyout");
       //
       //paragraph.style.setProperty("color", "#1f1f1f");
-      const now = new Date();
+      const now = new Date(e.currentlyouttimestamp)
       const hours = now.getHours();
       const minutes = now.getMinutes();
       const seconds = now.getSeconds();

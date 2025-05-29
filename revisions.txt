@@ -150,3 +150,6 @@ Changing color if they are out
 
 1.33
 Changing color on inactive to be consistent 
+
+1.34
+Forgot to display currentlyouttimestamp instead of Date.now()
