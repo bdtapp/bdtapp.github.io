@@ -15,5 +15,15 @@ const firebaseConfig = {
     messagingSenderId: "315285039462",
     appId: "1:315285039462:web:5fccff153213033cc680a7"
 };
-
+/*
+const firebaseConfig = {
+    apiKey: "AIzaSyBxDTEmUvnytKC9nU5HQU1yDOCnQsSl3QQ",
+    authDomain: "testdb-a5b32.firebaseapp.com",
+    databaseURL: "https://testdb-a5b32-default-rtdb.firebaseio.com",
+    projectId: "testdb-a5b32",
+    storageBucket: "testdb-a5b32.firebasestorage.app",
+    messagingSenderId: "933418442366",
+    appId: "1:933418442366:web:9d5d1fc7a1174d59d3c22f"
+  };
+  */
 const app = initializeApp(firebaseConfig);
