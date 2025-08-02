@@ -47,10 +47,13 @@
                 <a>
                     <h1 id="totalcount" style="color: hsl(242, 30%, 41%);">0</h1>
                 </a>
+                <a onclick="window.ToggleSearchByOwner()">
+                    <i class="fa-solid fa-shuffle fa-2xl sortswapdetoggled" id="searchbyowner"></i>
+                </a>
             </div>
         </div>
         <div class="content" id="content">
-     
+
             <form class="add">
                 <input type="text" name="add" placeholder="Search" id="searchid">
                 <div class="input-buttons">
@@ -77,8 +80,10 @@
     <script type="module">
         import { Reactivate } from "./firebaseinactive.js";
         import { LocalCachePull } from "./firebaseinactive.js";
+        import { ToggleSearchByOwner } from "./firebaseinactive.js";
         window.Reactivate = Reactivate;
         window.LocalCachePull = LocalCachePull;
+        window.ToggleSearchByOwner = ToggleSearchByOwner;
     </script>
     <script>
 

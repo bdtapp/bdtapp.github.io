@@ -32,6 +32,13 @@ function GetPathForNodeActive(e) {
         owner: parent.getAttribute("owner"),
     };
 }
+let searchbyowner = false;
+export const ToggleSearchByOwner = () => {
+    let e = document.getElementById("searchbyowner");
+    e.classList.toggle("sortswapdetoggled");
+    e.classList.toggle("sortswaptoggled");
+    searchbyowner = !searchbyowner;
+}
 export const Reactivate = (e) => {
     topscroll = e.parentNode.parentNode.scrollTop;
     let obj = GetPathForNode(e);
@@ -112,14 +119,26 @@ function HandleSnapshotContainer(snapshot, search) {
                 owner: owner
             });
         } else {
-            if (name.toLowerCase().includes(search.toLowerCase())) {
-                container.push({
-                    key: childkey,
-                    name: name,
-                    active: active,
-                    owner: owner
-                });
+            if (!searchbyowner) {
+                if (name.toLowerCase().includes(search.toLowerCase())) {
+                    container.push({
+                        key: childkey,
+                        name: name,
+                        active: active,
+                        owner: owner
+                    });
+                }
+            } else {
+                if (owner.toLowerCase().includes(search.toLowerCase())) {
+                    container.push({
+                        key: childkey,
+                        name: name,
+                        active: active,
+                        owner: owner
+                    });
+                }
             }
+
         }
 
     });
@@ -160,8 +179,8 @@ function CreateAndPopulateElements(container) {
         log.classList.add("fa-solid");
         log.classList.add("fa-clipboard");
         log.classList.add("fa-xl");
-        log.onclick = function(){
-            localStorage.setItem("logentry",e.key);
+        log.onclick = function () {
+            localStorage.setItem("logentry", e.key);
             window.location.href = "entrylog.html";
         }
 
@@ -201,8 +220,8 @@ function CreateAndPopulateElements(container) {
         li.appendChild(inpute);
         let paragraph = document.createElement("p");
         paragraph.innerHTML = e.name + "<br>" + e.owner;
-        if(e.active){
-            paragraph.style.setProperty("color","#1f1f1f");
+        if (e.active) {
+            paragraph.style.setProperty("color", "#1f1f1f");
         }
         labele.appendChild(paragraph);
         labele.appendChild(spane);
