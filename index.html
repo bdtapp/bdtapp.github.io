@@ -8,10 +8,7 @@
   <title>Verifying Access</title>
 
   <!-- Google Font -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
-    rel="stylesheet"
-  >
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     /* Reset & Base */
@@ -20,7 +17,9 @@
     *::after {
       box-sizing: border-box;
     }
-    html, body {
+
+    html,
+    body {
       margin: 0;
       padding: 0;
       height: 100%;
@@ -63,17 +62,26 @@
       letter-spacing: 0.5px;
     }
   </style>
-
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="firebaseloader.js"></script>
   <script>
-    // Immediately redirect based on stored path
-    (function() {
-      const path = localStorage.getItem("dbpath");
-      if (!path) {
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const path = localStorage.getItem('dbpath');
+    database.ref(path + '/foo').once('value')
+      .then(snapshot => {
+        if (snapshot.exists()) {
+          console.log(snapshot.val());
+          localStorage.setItem("dbpath", path);   // store the actual path
+          window.location.href = "active.html";
+        } else {
+          window.location.href = "login.html";
+        }
+      })
+      .catch(error => {
         window.location.href = "login.html";
-      } else {
-        window.location.href = "active.html";
-      }
-    })();
+      });
   </script>
 </head>
 

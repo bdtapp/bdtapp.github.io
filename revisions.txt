@@ -194,3 +194,6 @@ Cleaner index html
 cleaner login html
 TODO:
 Fix functionality of login html
+
+2.0
+All TODO completed.

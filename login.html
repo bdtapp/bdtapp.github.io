@@ -24,7 +24,7 @@
             height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                 Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-            background:                 linear-gradient(135deg,
+            background: linear-gradient(135deg,
                     rgba(102, 126, 234, 1.0) 0%,
                     rgba(118, 75, 162, 1.0) 100%);
             color: #333;
@@ -90,9 +90,7 @@
         }
     </style>
     </style>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="firebaseloader.js"></script>
+
 </head>
 
 <body>
@@ -101,48 +99,34 @@
 
 
     <script>
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database;
-        function TestAccessKey(key) {
-            const dbRef = database.ref('/');
-            const dbpath = key + "/internal";
-            get(child(dbRef, dbpath + "/foo")).then((snapshot) => {
-                if (snapshot.exists()) {
-                    console.log(snapshot.val());
-                    const msg = document.getElementById("idInvalidAccessKey");
-                    msg.textContent = "Success";
-                    localStorage.setItem("dbpath", dbpath);
-                    window.location.href = "index.html";
-                } else {
-                    const msg = document.getElementById("idInvalidAccessKey");
-                    msg.textContent = "Invalid Key";
-                }
-            }).catch((error) => {
-                const msg = document.getElementById("idInvalidAccessKey");
-                msg.textContent = "Invalid Key";
+
+        document.addEventListener("DOMContentLoaded", (event) => {
+            const form = document.getElementById('formdata');
+            console.log(form);
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent default form submission
+                let accesskey = document.getElementById('accessKey').value;
+
+                const path = `/${accesskey}/internal`;
+                localStorage.setItem('dbpath', path);
+                window.location.href = "index.html";
+                // Use once('value') instead of get('value', callback)
+
             });
-        }
-        function StoreAccessKey() {
-            const key = document.getElementById("idAccessKey");
-            TestAccessKey(key.value);
-        }
-        localStorage.setItem("editkey", "foo");
+        });
+
+
     </script>
 
-      <div class="login-card">
-    <h1>Enter Access Key</h1>
-    <form onsubmit="/* handle submission */ return false;">
-      <input
-        type="password"
-        id="accessKey"
-        placeholder="Access Key"
-        autocomplete="one-time-code"
-        autofocus
-        required
-      />
-      <button type="submit">Login</button>
-    </form>
-  </div>
+    <div class="login-card">
+        <h1>Enter Access Key</h1>
+        <form id="formdata">
+            <input type="password" id="accessKey" placeholder="Access Key" autocomplete="one-time-code" autofocus
+                required />
+            <button type="submit">Login</button>
+        </form>
+
+    </div>
 </body>
 
 </html>
