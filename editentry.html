@@ -1,103 +1,493 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <title>New</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="icon" href="images/checklist-2.png">
-    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700' rel='stylesheet' type='text/css'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Manager - Create Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-    <link rel="stylesheet" href="createnew.css">
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
 
+        /* Header with navigation */
+        .header {
+            padding: 20px 16px 16px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-icons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 0 8px;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            height: 44px;
+        }
+
+        .nav-icon:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-icon.active {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 12px;
+        }
+
+        /* Form */
+        .form-container {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px 20px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .form-input[type="number"]::-webkit-outer-spin-button,
+        .form-input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Radio buttons */
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .radio-option:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label {
+            color: #4ecdc4;
+            font-weight: 600;
+        }
+
+        .radio-option:has(input[type="radio"]:checked) {
+            background: rgba(78, 205, 196, 0.2);
+            border-color: rgba(78, 205, 196, 0.4);
+        }
+
+        .radio-label {
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Success message */
+        .success-message {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid rgba(46, 204, 113, 0.4);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #4ecdc4;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* Error message */
+        .error-message {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.4);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ff6b6b;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* Animations */
+        .form-group {
+            animation: fadeInUp 0.4s ease both;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+        .submit-btn { animation: fadeInUp 0.4s ease both; animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                max-width: none;
+            }
+            
+            .nav-icon {
+                font-size: 20px;
+                min-width: 40px;
+                height: 40px;
+            }
+            
+            .page-title {
+                font-size: 24px;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <div class="wrapper">
-        <form action="javascript:window.Reload()">
-            <div class="custom-header">
-                <a href="active.html">
-                    <i class="fa-solid fa-heart fa-2xl unselected"></i>
-                </a>
-                <a href="inactive.html">
-                    <i class="fa-solid fa-ban fa-2xl unselected"></i>
-                </a>
-                <a href="rooms.html">
-                    <i class="fa-solid fa-door-closed fa-2xl unselected"></i>
-                </a>
-                <a href="tasks.html">
-                    <i class="fa-solid fa-list-check fa-2x unselected"></i>
-                </a>
-                <a href="taskscompleted.html">
-                    <i class="fa-solid fa-check-double fa-2xl unselected"></i>
-                </a>
-                <a href="logs.html">
-                    <i class="fa-solid fa-clipboard fa-2xl unselected"></i>
-                </a>
-                <a href="createnew.html">
-                    <i class="fa-solid fa-pen fa-2x selected"></i>
-                </a>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="nav-icons">
+                <a href="active.html" class="nav-icon" data-page="active">❤️</a>
+                <a href="inactive.html" class="nav-icon" data-page="inactive">🚫</a>
+                <a href="rooms.html" class="nav-icon" data-page="rooms">🚪</a>
+                <a href="logs.html" class="nav-icon" data-page="logs">📝</a>
+                <a href="createnew.html" class="nav-icon active" data-page="create">➕</a>
+            </div>
+            <div class="page-title">Create Profile</div>
+        </div>
 
-
+        <!-- Form -->
+        <div class="form-container">
+            <div class="success-message" id="successMessage">
+                ✅ Pet profile created successfully!
             </div>
-            <div class="input-field">
-                <input type="text" id="date" readonly>
-            </div>
-            <div class="input-field">
-                <input type="text" required id="owner">
-                <label>Owner's Name</label>
-            </div>
-            <div class="input-field">
-                <input type="text" required id="name">
-                <label>Name</label>
-            </div>
-            <div class="input-field">
-                <input type="text" required id="sex" placeholder="M/F" onkeypress="return isNumberKey(event)">
-                <label>Sex</label>
-            </div>
-            <div class="forget">
-
-                <p>Sterile?</p>
-                <input type="checkbox" id="sterile">
-
-
-            </div>
-            <div class="input-field">
-                <input type="number" required step="1" min="0" max="20" id="age">
-                <label>Age</label>
+            
+            <div class="error-message" id="errorMessage">
+                ❌ Please fill in all required fields
             </div>
 
-            <button type="submit">Confirm</button>
-        </form>
+            <form id="petForm">
+                <div class="form-group">
+                    <label class="form-label" for="petName">Dog's Name *</label>
+                    <input 
+                        type="text" 
+                        id="petName" 
+                        class="form-input" 
+                        placeholder="Enter dog's name" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="ownerName">Owner's Name *</label>
+                    <input 
+                        type="text" 
+                        id="ownerName" 
+                        class="form-input" 
+                        placeholder="Enter owner's name" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="petAge">Age *</label>
+                    <input 
+                        type="number" 
+                        id="petAge" 
+                        class="form-input" 
+                        placeholder="Enter age (years)" 
+                        min="0" 
+                        max="30"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Sex *</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="sex" value="m" required>
+                            <span class="radio-label">Male</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sex" value="f" required>
+                            <span class="radio-label">Female</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Fixed *</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="fixed" value="true" required>
+                            <span class="radio-label">Yes</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="fixed" value="false" required>
+                            <span class="radio-label">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Create Pet Profile
+                </button>
+            </form>
+        </div>
     </div>
 
-    <script src="common.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script>
-        localStorage.setItem("redirect", "createnew.html");
-        function isNumberKey(evt) {
-            var charCode = (evt.which) ? evt.which : event.keyCode;
-            if ((charCode == 70 || charCode == 77))
-                return true;
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFni-5w7ivZnOuzAZ_3tNCzCLjn-B5AOg",
+            authDomain: "bdtremake.firebaseapp.com",
+            databaseURL: "https://bdtremake-default-rtdb.firebaseio.com",
+            projectId: "bdtremake",
+            storageBucket: "bdtremake.firebasestorage.app",
+            messagingSenderId: "780766289928",
+            appId: "1:780766289928:web:d9f74595e2040eb06ff1bd",
+            measurementId: "G-JQQMZXKY2F"
+        };
 
-            return false;
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const dogsRef = database.ref('BOSStonDOGtor/internal/Inactive');
+
+        // Form elements
+        const form = document.getElementById('petForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Hide messages
+        function hideMessages() {
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
         }
-    </script>
-    <script src="checkkey.js"></script>
-    <script type="module" src="firebaseloader.js"></script>
-    <script type="module" src="firebaseeditentry.js"></script>
-    <script type="module">
-        import { CreateNewEntry } from "./firebaseeditentry.js";
 
-        function Reload() {
-
-            CreateNewEntry();
-
+        // Show success message
+        function showSuccess() {
+            hideMessages();
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
         }
 
-        window.Reload = Reload;
+        // Show error message
+        function showError(message = 'Please fill in all required fields') {
+            hideMessages();
+            errorMessage.textContent = `❌ ${message}`;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const petName = document.getElementById('petName').value.trim();
+            const ownerName = document.getElementById('ownerName').value.trim();
+            const petAge = parseInt(document.getElementById('petAge').value);
+            const sex = document.querySelector('input[name="sex"]:checked')?.value;
+            const fixed = document.querySelector('input[name="fixed"]:checked')?.value === 'true';
+
+            // Validate required fields
+            if (!petName || !ownerName || isNaN(petAge) || !sex || document.querySelector('input[name="fixed"]:checked') === null) {
+                showError();
+                return;
+            }
+
+            // Validate age range
+            if (petAge < 0 || petAge > 30) {
+                showError('Age must be between 0 and 30 years');
+                return;
+            }
+
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating Profile...';
+
+            try {
+                // Create pet profile object
+                const petProfile = {
+                    name: petName,
+                    owner: ownerName,
+                    age: petAge,
+                    sex: sex,
+                    fixed: fixed,
+                    active: false // New pets start as inactive
+                };
+
+                // Save to Firebase
+                await dogsRef.push(petProfile);
+
+                // Show success message
+                showSuccess();
+
+                // Reset form
+                form.reset();
+
+            } catch (error) {
+                console.error('Error creating pet profile:', error);
+                showError('Failed to create pet profile. Please try again.');
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Pet Profile';
+            }
+        });
+
+        // Navigation
+
     </script>
 </body>
-
 </html>

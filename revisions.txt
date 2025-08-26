@@ -156,3 +156,30 @@ Forgot to display currentlyouttimestamp instead of Date.now()
 
 1.35
 Can search inactive by owner's name
+
+pre2.0-a
+Updated UI, redesign so htmls are self contained in js and css
+TODO: 
+Fix navigation on all tabs
+Complete inactive tabs to show edit entry 
+Rooms tab entirely
+
+Navigation on active/inactive/logs/create is working
+logs working
+create working
+
+pre2.0-b
+everything appears to be stable and working
+Still need to make an edit tab to edit dog info
+
+Old database entries "sterile" needs to be changed to "fixed" and y/n need to be changed to true/false
+
+pre2.0-c
+Changed active feeding colors,
+Inactive can now edit properly
+inactive and create no longer trim whitespaces
+each page renders background image as well
+Cleanup
+Files read key from localstorage
+
+TODO: Redo login, redo index.html

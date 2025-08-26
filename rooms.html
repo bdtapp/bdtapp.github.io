@@ -1,78 +1,461 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <title>Active</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="icon" href="images/checklist-2.png">
-    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700' rel='stylesheet' type='text/css'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Manager - Rooms</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                       background:
+                linear-gradient(135deg,
+                    rgba(102, 126, 234, 0.98) 0%,
+                    rgba(118, 75, 162, 0.98) 100%),
+                url('/images/bg.jpg') no-repeat center/cover;
+            min-height: 100vh;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-    <link rel="stylesheet" href="activelist.css">
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
 
+        /* Header with navigation */
+        .header {
+            padding: 20px 16px 16px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-icons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 0 8px;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            height: 44px;
+        }
+
+        .nav-icon:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-icon.active {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .counter {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .counter:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Room List */
+        .room-list {
+            padding: 24px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .room-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .room-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .room-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .room-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            margin-bottom: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .room-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .room-emoji {
+            font-size: 28px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .room-details {
+            flex: 1;
+        }
+
+        .room-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .room-description {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .room-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .room-count {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .count-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .count-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .count-btn:hover:not(.disabled) {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .count-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .count-btn.plus {
+            background: rgba(46, 204, 113, 0.3);
+            border-color: rgba(46, 204, 113, 0.5);
+        }
+
+        .count-btn.minus {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: rgba(231, 76, 60, 0.5);
+        }
+
+        .count-btn.plus:hover:not(.disabled) {
+            background: rgba(46, 204, 113, 0.4);
+        }
+
+        .count-btn.minus:hover:not(.disabled) {
+            background: rgba(231, 76, 60, 0.4);
+        }
+
+        /* Reset button */
+        .reset-section {
+            padding: 0 24px 24px;
+            text-align: center;
+        }
+
+        .reset-btn {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.4);
+            border-radius: 12px;
+            color: #fff;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: rgba(231, 76, 60, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Animations */
+        .room-item {
+            animation: fadeInUp 0.4s ease both;
+        }
+
+        .room-item:nth-child(1) { animation-delay: 0.1s; }
+        .room-item:nth-child(2) { animation-delay: 0.15s; }
+        .room-item:nth-child(3) { animation-delay: 0.2s; }
+        .room-item:nth-child(4) { animation-delay: 0.25s; }
+        .room-item:nth-child(5) { animation-delay: 0.3s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                max-width: none;
+            }
+            
+            .nav-icon {
+                font-size: 24px;
+                min-width: 44px;
+                height: 44px;
+            }
+            
+            .counter {
+                font-size: 28px;
+            }
+
+            .room-item {
+                padding: 16px;
+            }
+
+            .room-emoji {
+                font-size: 24px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .room-name {
+                font-size: 16px;
+            }
+
+            .room-count {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
-
 <body>
-
-  
-    <div class="todoList" id="todolist">
-        <div class="cover-img">
-            <div class="cover-inner">
-
-                <a href="active.html">
-                    <i class="fa-solid fa-heart fa-2xl unselected"></i>
-                </a>
-                <a href="inactive.html">
-                    <i class="fa-solid fa-ban fa-2xl unselected"></i>
-                </a>
-                <a href="rooms.html">
-                    <i class="fa-solid fa-door-closed fa-2xl selected"></i>
-                </a>
-                <a href="tasks.html">
-                    <i class="fa-solid fa-list-check fa-2x unselected" id="taskslink"></i>
-                </a>
-                <a href="taskscompleted.html">
-                    <i class="fa-solid fa-check-double fa-2xl unselected"></i>
-                </a>
-                <a href="logs.html">
-                    <i class="fa-solid fa-clipboard fa-2xl unselected"></i>
-                </a>
-                <a href="createnew.html">
-                    <i class="fa-solid fa-pen fa-2xl unselected"></i>
-                </a>
-                <a>
-                    <h1 id="outoftotal" style="color: hsl(264, 30%, 41%);">0/0</h1>
-                </a>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="nav-icons">
+                <a href="active.html" class="nav-icon" data-page="active">❤️</a>
+                <a href="inactive.html" class="nav-icon" data-page="inactive">🚫</a>
+                <a href="rooms.html" class="nav-icon active" data-page="rooms">🚪</a>
+                <a href="logs.html" class="nav-icon" data-page="logs">📝</a>
+                <a href="createnew.html" class="nav-icon" data-page="create">➕</a>
             </div>
-        </div>
-        <div class="content" id="content">
-
-            <div id="accordian">
-
-            </div>
-
+            <div class="counter" id="totalCounter">0/0</div>
         </div>
 
+        <!-- Room List -->
+        <div class="room-list" id="roomList">
+            <!-- Rooms will be rendered here -->
+        </div>
+
+        <!-- Reset Section -->
+        <div class="reset-section">
+            <button class="reset-btn" onclick="resetAllRooms()">Reset All Rooms</button>
+        </div>
     </div>
 
-    <script src="common.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="firebaseloader.js"></script>
     <script>
-        localStorage.setItem("redirect", "rooms.html");
+        // Firebase configuration
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const dbkey = localStorage.getItem('dbpath');
+        const dogsRef = database.ref(`${dbkey}/Active`);
+        const roomsRef = database.ref(`${dbkey}/Rooms`);
+        
+        let activeDogCount = 0;
+        let rooms = {
+            RoomLivingRoom: { name: 'Living Room', emoji: '🛋️', description: 'Main lounge area', count: 0 },
+            RoomKitchen: { name: 'Kitchen', emoji: '🍽️', description: 'Food and water area', count: 0 },
+            RoomYard: { name: 'Yard Room', emoji: '🌿', description: 'Indoor/outdoor access', count: 0 },
+            RoomBack: { name: 'Back Room', emoji: '🚪', description: 'Quiet space', count: 0 },
+            RoomUpstairs: { name: 'Upstairs', emoji: '⬆️', description: 'Upper level', count: 0 }
+        };
+
+        // Listen for changes in active dogs count
+        dogsRef.on('value', (snapshot) => {
+            activeDogCount = snapshot.numChildren() || 0;
+            updateTotalCounter();
+            renderRooms();
+        });
+
+        // Listen for changes in room data
+        roomsRef.on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                const roomData = snapshot.val();
+                Object.keys(rooms).forEach(roomId => {
+                    if (roomData[roomId] && typeof roomData[roomId].count === 'number') {
+                        rooms[roomId].count = roomData[roomId].count;
+                    }
+                });
+            }
+            renderRooms();
+        });
+
+        function renderRooms() {
+            const roomList = document.getElementById('roomList');
+            const totalInRooms = Object.values(rooms).reduce((sum, room) => sum + room.count, 0);
+            
+            roomList.innerHTML = Object.entries(rooms).map(([roomId, room]) => {
+                const canIncrease = totalInRooms < activeDogCount;
+                const canDecrease = room.count > 0;
+                
+                return `
+                    <div class="room-item">
+                        <div class="room-info">
+                            <div class="room-emoji">${room.emoji}</div>
+                            <div class="room-details">
+                                <div class="room-name">${room.name}</div>
+                                <div class="room-description">${room.description}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="room-controls">
+                            <div class="room-count">${room.count}</div>
+                            <div class="count-controls">
+                                <button class="count-btn plus ${canIncrease ? '' : 'disabled'}" 
+                                        onclick="adjustRoomCount('${roomId}', 1)"
+                                        ${canIncrease ? '' : 'disabled'}>+</button>
+                                <button class="count-btn minus ${canDecrease ? '' : 'disabled'}" 
+                                        onclick="adjustRoomCount('${roomId}', -1)"
+                                        ${canDecrease ? '' : 'disabled'}>−</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateTotalCounter();
+        }
+
+        function adjustRoomCount(roomId, delta) {
+            const room = rooms[roomId];
+            if (!room) return;
+
+            const totalInRooms = Object.values(rooms).reduce((sum, r) => sum + r.count, 0);
+            const newCount = room.count + delta;
+
+            // Validate the change
+            if (delta > 0 && totalInRooms >= activeDogCount) return;
+            if (delta < 0 && room.count <= 0) return;
+            if (newCount < 0) return;
+
+            // Update local state
+            rooms[roomId].count = newCount;
+
+            // Save to Firebase
+            roomsRef.child(roomId).update({ count: newCount });
+        }
+
+        function updateTotalCounter() {
+            const totalInRooms = Object.values(rooms).reduce((sum, room) => sum + room.count, 0);
+            document.getElementById('totalCounter').textContent = `${totalInRooms}/${activeDogCount}`;
+        }
+
+        function resetAllRooms() {
+            if (confirm('Reset all room counts to 0?')) {
+                Object.keys(rooms).forEach(roomId => {
+                    rooms[roomId].count = 0;
+                    roomsRef.child(roomId).update({ count: 0 });
+                });
+            }
+        }
+
+        // Initialize rooms in Firebase if they don't exist
+        roomsRef.once('value', (snapshot) => {
+            if (!snapshot.exists()) {
+                const initialRoomData = {};
+                Object.keys(rooms).forEach(roomId => {
+                    initialRoomData[roomId] = { count: 0 };
+                });
+                roomsRef.set(initialRoomData);
+            }
+        });
     </script>
-    <script src="checkkey.js"></script>
-    <script type="module" src="firebaseloader.js"></script>
-    <script type="module" src="firebaserooms.js"></script>
-    <script type="module">
-
-    </script>
-    <script>
-
-    </script>
-
-
-
 </body>
-
 </html>

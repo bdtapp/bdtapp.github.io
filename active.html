@@ -1,119 +1,550 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>Active</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="icon" href="images/checklist-2.png">
-    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700' rel='stylesheet' type='text/css'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-    <link rel="stylesheet" href="activelist.css">
+            /* 1) List the gradient first, then the image */
+            background:
+                linear-gradient(135deg,
+                    rgba(102, 126, 234, 0.98) 0%,
+                    rgba(118, 75, 162, 0.98) 100%),
+                url('/images/bg.jpg') no-repeat center/cover;
+
+            /* 2) Ensure it fills the viewport */
+            min-height: 100vh;
+
+            /* 3) Flex centering and padding stay the same */
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+
+        }
+
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header with navigation */
+        .header {
+            padding: 20px 16px 16px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-icons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 0 8px;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            height: 44px;
+        }
+
+        .nav-icon:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-icon.active {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .counter {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .counter:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Search */
+        .search {
+            padding: 0 24px 24px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 16px 20px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Pet List */
+        .pet-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 0 24px 24px;
+        }
+
+        .pet-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .pet-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .pet-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .pet-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pet-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .pet-item.completed {
+            opacity: 0.7;
+            background: rgba(46, 204, 113, 0.15);
+            border-color: rgba(46, 204, 113, 0.4);
+        }
+
+        .pet-item.out {
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .pet-item.fed {
+            border-right: 4px solid #774fcc;
+        }
+
+        /* Checkbox - removed */
+
+        /* Pet Info */
+        .pet-info {
+            flex: 1;
+            margin-right: 16px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .pet-info:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .pet-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .pet-item.completed .pet-name {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .pet-owner {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .pet-status {
+            font-size: 12px;
+            color: #ff6b6b;
+            margin-top: 4px;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .action-btn.fed {
+            background: #8163c1;
+        }
+
+        .action-btn.out {
+            background: rgba(255, 107, 107, 0.3);
+        }
+
+        /* Sort Toggle - removed */
+
+        /* Animations */
+        .pet-item {
+            animation: fadeInUp 0.4s ease both;
+        }
+
+        .pet-item:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .pet-item:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .pet-item:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .pet-item:nth-child(4) {
+            animation-delay: 0.25s;
+        }
+
+        .pet-item:nth-child(5) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                max-width: none;
+            }
+
+            .nav-icon {
+                font-size: 24px;
+                min-width: 44px;
+                height: 44px;
+            }
+
+            .counter {
+                font-size: 28px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="todoList" id="todolist">
-        <div class="cover-img">
-            <div class="cover-inner">
-
-                <a href="active.html">
-                    <i class="fa-solid fa-heart fa-2xl selected"></i>
-                </a>
-                <a href="inactive.html">
-                    <i class="fa-solid fa-ban fa-2xl unselected"></i>
-                </a>
-                <a href="rooms.html">
-                    <i class="fa-solid fa-door-closed fa-2xl unselected"></i>
-                </a>
-                <a href="tasks.html">
-                    <i class="fa-solid fa-list-check fa-2x unselected" id="taskslink"></i>
-                </a>
-                <a href="taskscompleted.html">
-                    <i class="fa-solid fa-check-double fa-2xl unselected"></i>
-                </a>
-                <a href="logs.html">
-                    <i class="fa-solid fa-clipboard fa-2xl unselected"></i>
-                </a>
-
-                <a href="createnew.html">
-                    <i class="fa-solid fa-pen fa-2xl unselected"></i>
-                </a>
-                <a onclick="window.ResetStates()">
-                    <h1 class="special-check" id="outoftotal">0</h1>
-                </a>
-                <a onclick="window.ToggleSortByOwner()">
-                    <i class="fa-solid fa-shuffle fa-2xl sortswapdetoggled" id="sortbyowner"></i>
-                </a>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="nav-icons">
+                <a href="active.html" class="nav-icon active" data-page="active">❤️</a>
+                <a href="inactive.html" class="nav-icon" data-page="inactive">🚫</a>
+                <a href="rooms.html" class="nav-icon" data-page="rooms">🚪</a>
+                <a href="logs.html" class="nav-icon" data-page="logs">📝</a>
+                <a href="createnew.html" class="nav-icon" data-page="create">➕</a>
             </div>
-        </div>
-        <div class="content" id="content">
-            <form class="add" action="javascript:()=>{}">
-                <input type="text" name="add" placeholder="Search" id="searchid">
-                <div class="input-buttons">
-                    <a href="#" class="add-todo">
-                        <i class="fas fa-x add" onclick="ClearSearch()"></i>
-                    </a>
-                </div>
-            </form>
-            <div id="accordian">
-
-            </div>
-
+            <div class="counter" id="counter" onclick="resetAll()">8/12</div>
         </div>
 
+        <!-- Search -->
+        <div class="search">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search pets..." id="searchInput">
+                <button class="clear-btn" onclick="clearSearch()">✕</button>
+            </div>
+        </div>
+
+        <!-- Pet List -->
+        <div class="pet-list" id="petList">
+            <!-- Pets will be rendered here -->
+        </div>
     </div>
 
-    <script src="common.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="firebaseloader.js"></script>
     <script>
-        localStorage.setItem("redirect", "active.html");
-    </script>
-    <script src="checkkey.js"></script>
-    <script type="module" src="firebaseloader.js"></script>
-    <script type="module" src="firebaseactive.js"></script>
-    <script type="module">
-        import { ToggleOut } from "./firebaseactive.js";
-        import { ToggleFed } from "./firebaseactive.js";
-        import { ToggleClear } from "./firebaseactive.js";
-        import { ResetStates } from "./firebaseactive.js";
-        import { RemoveFromActive } from "./firebaseactive.js";
-        import { LocalCachePull } from "./firebaseactive.js";
-        import { ToggleSortByOwner } from "./firebaseactive.js";
+        firebase.initializeApp(firebaseConfig);
+        const dbkey = localStorage.getItem('dbpath');
+        const database = firebase.database();
+        const dogsRef = database.ref(`${dbkey}/Active`);
+        const inactiveDogsRef = database.ref(`${dbkey}/Inactive`);
+        const logsRef = database.ref(`${dbkey}/Logs`);
+        let pets = [];
+        let sortByOwner = false;
+        let searchTerm = '';
 
+        // Listen for changes in Firebase
+        dogsRef.on('value', (snapshot) => {
+            pets = [];
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const pet = {
+                        id: childSnapshot.key,
+                        ...childSnapshot.val()
+                    };
+                    pets.push(pet);
+                });
+            }
+            renderPets();
+        });
 
-        window.ToggleOut = ToggleOut;
-        window.ToggleFed = ToggleFed;
-        window.ToggleClear = ToggleClear;
-        window.ResetStates = ResetStates;
-        window.RemoveFromActive = RemoveFromActive;
-        window.LocalCachePull = LocalCachePull;
-        window.ToggleSortByOwner = ToggleSortByOwner;
+        function renderPets() {
+            let filtered = pets.filter(pet =>
+                (pet.name || '').toLowerCase().includes(searchTerm.toLowerCase())
+            );
 
-        let updatemessage = localStorage.getItem("v1.30update");
-        if(updatemessage==null||updatemessage==undefined){
-            //localStorage.setItem("v1.30update","true");
-            //alert("Update: Dog's name appears red when they are let out.\nTap their name again once they are back in");
+            if (sortByOwner) {
+                filtered.sort((a, b) => (a.owner || '').localeCompare(b.owner || ''));
+            } else {
+                filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            }
+
+            const petList = document.getElementById('petList');
+            petList.innerHTML = filtered.map(pet => {
+                const classes = [
+                    'pet-item',
+                    pet.cleared ? 'completed' : '',
+                    pet.out ? 'out' : '',
+                    pet.fed ? 'fed' : ''
+                ].filter(Boolean).join(' ');
+
+                const timeOut = pet.currentlyOut && pet.currentlyouttimestamp ?
+                    new Date(pet.currentlyouttimestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+                return `
+                    <div class="${classes}">
+                        <div class="pet-info" onclick="toggleCleared('${pet.id}')">
+                            <div class="pet-name">${pet.name || 'Unknown'}</div>
+                            <div class="pet-owner">${pet.owner || 'No Owner'}</div>
+                            ${pet.currentlyOut ? `<div class="pet-status">Out since ${timeOut}</div>` : ''}
+                        </div>
+                        
+                        <div class="actions">
+                            <button class="action-btn ${pet.fed ? 'fed' : ''}" onclick="toggleFed('${pet.id}')">🍚</button>
+                            <button class="action-btn ${pet.out ? 'out' : ''}" onclick="toggleOut('${pet.id}')">💩</button>
+                            <button class="action-btn" onclick="removePet('${pet.id}')">🚫</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateCounter();
         }
-    </script>
-    <script>
 
-
-        let e = document.getElementById("searchid");
-        e.value = "";
-        e.oninput = function (event) {
-
-            LocalCachePull(e.value);
+        function updateCounter() {
+            const completed = pets.filter(p => p.cleared).length;
+            const total = pets.length;
+            document.getElementById('counter').textContent = `${total - completed}/${total}`;
         }
 
-        function ClearSearch() {
-            e.value = "";
-            LocalCachePull(e.value);
+        function toggleCleared(id) {
+            const pet = pets.find(p => p.id === id);
+            if (pet) {
+                if (pet.currentlyOut) {
+                    // If currently out, bring them back in (clear timestamp and currentlyOut)
+                    const updates = {
+                        currentlyOut: false,
+                        currentlyouttimestamp: null
+                    };
+                    dogsRef.child(id).update(updates);
+                } else {
+                    // Normal cleared toggle when not currently out
+                    const updates = { cleared: !pet.cleared };
+                    dogsRef.child(id).update(updates);
+                }
+            }
         }
+
+        function toggleFed(id) {
+            const pet = pets.find(p => p.id === id);
+            if (pet) {
+                const updates = { fed: !pet.fed };
+                dogsRef.child(id).update(updates);
+            }
+        }
+
+        function toggleOut(id) {
+            const pet = pets.find(p => p.id === id);
+            if (pet) {
+                const updates = {
+                    out: !pet.out,
+                    currentlyOut: !pet.out,
+                    currentlyouttimestamp: !pet.out ? Date.now() : null
+                };
+                dogsRef.child(id).update(updates);
+            }
+        }
+
+        function removePet(id) {
+            const pet = pets.find(p => p.id === id);
+            if (pet && confirm(`Send ${pet.name} home?`)) {
+                // Get current count before removing
+                dogsRef.once('value', (snapshot) => {
+                    const currentActiveCount = snapshot.numChildren();
+                    const newActiveCount = Math.max(0, currentActiveCount - 1);
+
+                    // Remove from active collection
+                    dogsRef.child(id).remove();
+
+                    // Update in inactive collection to set active = false
+                    inactiveDogsRef.child(id).update({ active: false });
+
+                    // Add departure log entry
+                    const logEntry = {
+                        timestamp: Date.now(),
+                        departed: new Date().toISOString(),
+                        name: pet.name,
+                        owner: pet.owner,
+                        id: id,
+                        count: newActiveCount,
+                        active: false
+                    };
+
+                    const randomKey = logsRef.push().key;
+                    logsRef.child(randomKey).update(logEntry);
+                });
+            }
+        }
+
+        function resetAll() {
+            if (confirm('Reset all states?')) {
+                pets.forEach(pet => {
+                    const updates = {
+                        fed: false,
+                        out: false,
+                        cleared: false,
+                        currentlyOut: false,
+                        currentlyouttimestamp: null
+                    };
+                    dogsRef.child(pet.id).update(updates);
+                });
+            }
+        }
+
+        function toggleSort() {
+            sortByOwner = !sortByOwner;
+            renderPets();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchTerm = '';
+            renderPets();
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            renderPets();
+        });
+
+
     </script>
-
-
-
 </body>
 
 </html>
