@@ -200,3 +200,6 @@ All TODO completed.
 
 2.01
 Rooms working correctly
+
+2.02
+We don't need a reset room button
