@@ -215,3 +215,6 @@ Room-item size change
 
 2.06
 Debug toggle for active and inactive
+
+2.07
+Icon consistency
