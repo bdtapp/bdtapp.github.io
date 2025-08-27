@@ -1,5 +1,5 @@
 
-/*
+
 const firebaseConfig = {
     apiKey: "AIzaSyBzjJ6wmc-OkVoEfWn2SXQX5HWInlrv-q4",
     authDomain: "bdtwebapp.firebaseapp.com",
@@ -9,8 +9,8 @@ const firebaseConfig = {
     messagingSenderId: "315285039462",
     appId: "1:315285039462:web:5fccff153213033cc680a7"
 };
-*/
 
+/*
 const firebaseConfig = {
   apiKey: "AIzaSyBFni-5w7ivZnOuzAZ_3tNCzCLjn-B5AOg",
   authDomain: "bdtremake.firebaseapp.com",
@@ -21,5 +21,5 @@ const firebaseConfig = {
   appId: "1:780766289928:web:d9f74595e2040eb06ff1bd",
   measurementId: "G-JQQMZXKY2F"
 };
-
+*/
 // Initialize Firebase
