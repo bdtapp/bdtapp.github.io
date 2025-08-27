@@ -394,6 +394,14 @@
         });
 
         function renderPets() {
+            pets.forEach(pet => {
+                if (pet.fed && pet.out && !pet.cleared) {
+                    pet.cleared = true;
+                    // If you persist pets to localStorage or a backend,
+                    // call your save/update function here
+                    // savePets();
+                }
+            });
             let filtered = pets.filter(pet =>
                 (pet.name || '').toLowerCase().includes(searchTerm.toLowerCase())
             );
