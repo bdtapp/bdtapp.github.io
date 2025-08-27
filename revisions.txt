@@ -212,3 +212,6 @@ Cards (item) size adjusted in active, inactive, rooms, logs
 
 2.05
 Room-item size change
+
+2.06
+Debug toggle for active and inactive

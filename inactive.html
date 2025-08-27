@@ -659,7 +659,7 @@
         let pets = [];
         let searchTerm = '';
         let currentEditingId = null;
-
+        let debuglockon = false;
         // Listen for changes in Firebase
         inactiveDogsRef.on('value', (snapshot) => { 
             pets = [];
@@ -676,6 +676,10 @@
         });
 
         function editEntry(id) {
+            if(debuglockon)
+                return;
+
+
             currentEditingId = id;
             // Fetch pet data from /key/internal/${id}
             inactiveDogsRef.child(id).once('value', (snapshot) => {
@@ -841,6 +845,9 @@
         }
 
         function toggleActive(id) {
+            if(debuglockon)
+                return;
+
             const pet = pets.find(p => p.id === id);
             if (pet && !pet.active) {
                 // First get the current count of active dogs
@@ -884,6 +891,11 @@
         // Event listeners
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchTerm = e.target.value;
+            if(searchTerm==='toggledebugmodeon'){
+                localStorage.setItem('debugmode','true');
+            }else if(searchTerm==='toggledebugmodeoff'){
+                localStorage.setItem('debugmode','false');
+            }
             renderPets();
         });
 
@@ -904,6 +916,47 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && document.getElementById('editModal').classList.contains('show')) {
                 closeEditModal();
+            }
+        });
+
+                ////DEBUG
+        document.addEventListener("DOMContentLoaded", (event) => {
+            const debugmode = localStorage.getItem('debugmode');
+            if (debugmode === "true") {
+                const navicons = document.getElementsByClassName('nav-icons')[0];
+                const debuglock = document.createElement('a');
+                const debugicon = document.createElement('a');
+                debugicon.classList.add('nav-icon');
+                debugicon.setAttribute('href','#');
+                debugicon.innerText = '💀';
+                debuglock.classList.add('nav-icon');
+                debuglock.innerText = '🔓';
+                debuglock.setAttribute('href','#');
+                //navicons.appendChild(debugicon);
+                navicons.appendChild(debuglock);
+                debuglock.onclick = function(){
+                    debuglockon = !debuglockon;
+                    if(debuglockon){
+                        localStorage.setItem('debuglock','true');
+                        debuglock.innerText = '🔒';
+                    }else{
+                        localStorage.setItem('debuglock','false');
+                        debuglock.innerText = '🔓';
+                    }
+                }
+                debugicon.onclick = function(){
+                    localStorage.setItem('debugmode','false');
+                    localStorage.setItem('debuglock','false');
+                    debuglockon = false;
+                    navicons.removeChild(debugicon);
+                    navicons.removeChild(debuglock);
+                }
+                const isdebuglockon = localStorage.getItem('debuglock');
+                if(isdebuglockon==='true'){
+                   debuglockon = true;
+                }
+            }else{
+    
             }
         });
     </script>

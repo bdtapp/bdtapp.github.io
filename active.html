@@ -377,7 +377,7 @@
         let pets = [];
         let sortByOwner = false;
         let searchTerm = '';
-
+        let debuglockon = false;
         // Listen for changes in Firebase
         dogsRef.on('value', (snapshot) => {
             pets = [];
@@ -451,6 +451,8 @@
         }
 
         function toggleCleared(id) {
+            if (debuglockon)
+                return;
             const pet = pets.find(p => p.id === id);
             if (pet) {
                 if (pet.currentlyOut) {
@@ -469,6 +471,8 @@
         }
 
         function toggleFed(id) {
+            if (debuglockon)
+                return;
             const pet = pets.find(p => p.id === id);
             if (pet) {
                 const updates = { fed: !pet.fed };
@@ -477,6 +481,8 @@
         }
 
         function toggleOut(id) {
+            if (debuglockon)
+                return;
             const pet = pets.find(p => p.id === id);
             if (pet) {
                 const updates = {
@@ -489,6 +495,8 @@
         }
 
         function removePet(id) {
+            if (debuglockon)
+                return;
             const pet = pets.find(p => p.id === id);
             if (pet && confirm(`Send ${pet.name} home?`)) {
                 // Get current count before removing
@@ -520,6 +528,8 @@
         }
 
         function resetAll() {
+            if (debuglockon)
+                return;
             if (confirm('Reset all states?')) {
                 pets.forEach(pet => {
                     const updates = {
@@ -548,9 +558,56 @@
         // Event listeners
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchTerm = e.target.value;
+            if (searchTerm === 'toggledebugmodeon') {
+                console.log('wow');
+                localStorage.setItem('debugmode', 'true');
+            } else if (searchTerm === 'toggledebugmodeoff') {
+                localStorage.setItem('debugmode', 'false');
+            }
             renderPets();
         });
 
+
+        ////DEBUG
+        document.addEventListener("DOMContentLoaded", (event) => {
+            const debugmode = localStorage.getItem('debugmode');
+            if (debugmode === "true") {
+                const navicons = document.getElementsByClassName('nav-icons')[0];
+                const debuglock = document.createElement('a');
+                const debugicon = document.createElement('a');
+                debugicon.classList.add('nav-icon');
+                debugicon.setAttribute('href', '#');
+                debugicon.innerText = '💀';
+                debuglock.classList.add('nav-icon');
+                debuglock.innerText = '🔓';
+                debuglock.setAttribute('href', '#');
+                //navicons.appendChild(debugicon);
+                navicons.appendChild(debuglock);
+                debuglock.onclick = function () {
+                    debuglockon = !debuglockon;
+                    if (debuglockon) {
+                        localStorage.setItem('debuglock', 'true');
+                        debuglock.innerText = '🔒';
+                    } else {
+                        localStorage.setItem('debuglock', 'false');
+                        debuglock.innerText = '🔓';
+                    }
+                }
+                debugicon.onclick = function () {
+                    localStorage.setItem('debugmode', 'false');
+                    localStorage.setItem('debuglock', 'false');
+                    debuglockon = false;
+                    navicons.removeChild(debugicon);
+                    navicons.removeChild(debuglock);
+                }
+                const isdebuglockon = localStorage.getItem('debuglock');
+                if (isdebuglockon === 'true') {
+                    debuglockon = true;
+                }
+            } else {
+
+            }
+        });
 
     </script>
 </body>
