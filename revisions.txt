@@ -209,3 +209,6 @@ Date created when creating new profile
 
 2.04
 Cards (item) size adjusted in active, inactive, rooms, logs
+
+2.05
+Room-item size change
