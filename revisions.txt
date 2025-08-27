@@ -197,3 +197,6 @@ Fix functionality of login html
 
 2.0
 All TODO completed.
+
+2.01
+Rooms working correctly
