@@ -203,3 +203,6 @@ Rooms working correctly
 
 2.02
 We don't need a reset room button
+
+2.03
+Date created when creating new profile
