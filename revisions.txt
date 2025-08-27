@@ -206,3 +206,6 @@ We don't need a reset room button
 
 2.03
 Date created when creating new profile
+
+2.04
+Cards (item) size adjusted in active, inactive, rooms, logs
