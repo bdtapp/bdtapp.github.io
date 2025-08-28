@@ -218,3 +218,6 @@ Debug toggle for active and inactive
 
 2.07
 Icon consistency
+
+2.08
+Darkened active and completed colors
