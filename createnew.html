@@ -240,6 +240,47 @@
             display: none;
         }
 
+        /* Connection status */
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .connection-status.connected {
+            background: rgba(46, 204, 113, 0.2);
+            color: #4ecdc4;
+            border: 1px solid rgba(46, 204, 113, 0.4);
+        }
+
+        .connection-status.disconnected {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.4);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .connected .status-dot {
+            background: #4ecdc4;
+        }
+
+        .disconnected .status-dot {
+            background: #ff6b6b;
+        }
+
         /* Animations */
         .form-group {
             animation: fadeInUp 0.4s ease both;
@@ -284,10 +325,22 @@
                 flex-direction: column;
                 gap: 12px;
             }
+            
+            .connection-status {
+                top: 5px;
+                right: 5px;
+                font-size: 10px;
+                padding: 6px 10px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="connection-status disconnected" id="connectionStatus">
+        <div class="status-dot"></div>
+        <span>Disconnected</span>
+    </div>
+    
     <div class="container">
         <!-- Header -->
         <div class="header">
@@ -383,21 +436,113 @@
     </div>
 
     <script>
-        // API base URL - change this if your server runs on a different port or domain
-        const API_BASE_URL = 'http://localhost:3000/api';
-
+        // WebSocket connection
+        const WS_URL = `ws://${window.location.hostname}:3000`;
+        let socket = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+        
         // Form elements
         const form = document.getElementById('petForm');
         const submitBtn = document.getElementById('submitBtn');
         const successMessage = document.getElementById('successMessage');
         const errorMessage = document.getElementById('errorMessage');
-
+        const connectionStatus = document.getElementById('connectionStatus');
+        
+        // Initialize WebSocket connection
+        function connectWebSocket() {
+            try {
+                socket = new WebSocket(WS_URL);
+                
+                socket.addEventListener('open', () => {
+                    console.log('WebSocket connection established');
+                    updateConnectionStatus(true);
+                    reconnectAttempts = 0;
+                });
+                
+                socket.addEventListener('message', (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        handleWebSocketMessage(data);
+                    } catch (error) {
+                        console.error('Error parsing WebSocket message:', error);
+                    }
+                });
+                
+                socket.addEventListener('close', () => {
+                    console.log('WebSocket connection closed');
+                    updateConnectionStatus(false);
+                    
+                    // Attempt to reconnect with exponential backoff
+                    if (reconnectAttempts < maxReconnectAttempts) {
+                        const delay = Math.pow(2, reconnectAttempts) * 1000;
+                        setTimeout(() => {
+                            reconnectAttempts++;
+                            console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
+                            connectWebSocket();
+                        }, delay);
+                    }
+                });
+                
+                socket.addEventListener('error', (error) => {
+                    console.error('WebSocket error:', error);
+                    updateConnectionStatus(false);
+                });
+                
+            } catch (error) {
+                console.error('Error creating WebSocket connection:', error);
+                updateConnectionStatus(false);
+            }
+        }
+        
+        // Update connection status UI
+        function updateConnectionStatus(connected) {
+            if (connected) {
+                connectionStatus.classList.remove('disconnected');
+                connectionStatus.classList.add('connected');
+                connectionStatus.innerHTML = '<div class="status-dot"></div><span>Connected</span>';
+            } else {
+                connectionStatus.classList.remove('connected');
+                connectionStatus.classList.add('disconnected');
+                connectionStatus.innerHTML = '<div class="status-dot"></div><span>Disconnected</span>';
+            }
+        }
+        
+        // Handle incoming WebSocket messages
+        function handleWebSocketMessage(data) {
+            switch (data.action) {
+                case 'petCreated':
+                    showSuccess();
+                    form.reset();
+                    break;
+                    
+                case 'error':
+                    showError(data.message || 'Failed to create pet profile');
+                    break;
+                    
+                default:
+                    console.log('Unknown message type:', data.action);
+            }
+        }
+        
+        // Send message via WebSocket
+        function sendWebSocketMessage(message) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify(message));
+                return true;
+            } else {
+                console.error('WebSocket is not connected');
+                updateConnectionStatus(false);
+                return false;
+            }
+        }
+        
         // Hide messages
         function hideMessages() {
             successMessage.style.display = 'none';
             errorMessage.style.display = 'none';
         }
-
+        
         // Show success message
         function showSuccess() {
             hideMessages();
@@ -405,8 +550,12 @@
             setTimeout(() => {
                 successMessage.style.display = 'none';
             }, 3000);
+            
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Pet Profile';
         }
-
+        
         // Show error message
         function showError(message = 'Please fill in all required fields') {
             hideMessages();
@@ -415,8 +564,12 @@
             setTimeout(() => {
                 errorMessage.style.display = 'none';
             }, 3000);
+            
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Pet Profile';
         }
-
+        
         // Form submission
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -428,60 +581,50 @@
             const sex = document.querySelector('input[name="sex"]:checked')?.value;
             const fixedValue = document.querySelector('input[name="fixed"]:checked')?.value;
             const fixed = fixedValue === 'true';
-
+            
             // Validate required fields
             if (!petName || !ownerName || isNaN(petAge) || !sex || fixedValue === null) {
                 showError();
                 return;
             }
-
+            
             // Validate age range
             if (petAge < 0 || petAge > 30) {
                 showError('Age must be between 0 and 30 years');
                 return;
             }
-
+            
             // Disable submit button
             submitBtn.disabled = true;
             submitBtn.textContent = 'Creating Profile...';
-
-            try {
-                // Create pet profile object
-                const petProfile = {
-                    name: petName,
-                    owner: ownerName,
-                    age: petAge,
-                    sex: sex,
-                    fixed: fixed
-                };
-
-                // Send POST request to server
-                const response = await fetch(`${API_BASE_URL}/pets`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(petProfile)
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Success - show message and reset form
-                    showSuccess();
-                    form.reset();
-                } else {
-                    // Server returned an error
-                    throw new Error(data.error || 'Failed to create pet profile');
-                }
-
-            } catch (error) {
-                console.error('Error creating pet profile:', error);
-                showError(error.message || 'Failed to create pet profile. Please try again.');
-            } finally {
-                // Re-enable submit button
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Create Pet Profile';
+            
+            // Create pet profile object
+            const petProfile = {
+                action: 'createPet',
+                name: petName,
+                owner: ownerName,
+                age: petAge,
+                sex: sex,
+                fixed: fixed
+            };
+            
+            // Send via WebSocket
+            const sent = sendWebSocketMessage(petProfile);
+            
+            if (!sent) {
+                showError('Connection error. Please check your connection and try again.');
+            }
+        });
+        
+        // Initialize WebSocket connection when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            connectWebSocket();
+        });
+        
+        // Attempt to reconnect when page becomes visible again
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && (!socket || socket.readyState !== WebSocket.OPEN)) {
+                connectWebSocket();
             }
         });
     </script>
