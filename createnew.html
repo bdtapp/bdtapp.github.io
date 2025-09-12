@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                        background:
+            background:
                 linear-gradient(135deg,
                     rgba(102, 126, 234, 0.98) 0%,
                     rgba(118, 75, 162, 0.98) 100%),
@@ -48,7 +48,7 @@
 
         .nav-icons {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 8px;
             margin-bottom: 20px;
             padding: 0 8px;
@@ -295,7 +295,7 @@
                 <a href="active.html" class="nav-icon" data-page="active">❤️</a>
                 <a href="inactive.html" class="nav-icon" data-page="inactive">🚫</a>
                 <a href="rooms.html" class="nav-icon" data-page="rooms">🚪</a>
-                <a href="logs.html" class="nav-icon" data-page="logs">📝</a>
+                <a href="logs.html" class="nav-icon" data-page="logs">📄</a>
                 <a href="createnew.html" class="nav-icon active" data-page="create">➕</a>
             </div>
             <div class="page-title">Create Profile</div>
@@ -382,14 +382,9 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="firebaseloader.js"></script>
     <script>
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const dbkey = localStorage.getItem('dbpath');
-        const dogsRef = database.ref(`${dbkey}/Inactive`);
+        // API base URL - change this if your server runs on a different port or domain
+        const API_BASE_URL = 'http://localhost:3000/api';
 
         // Form elements
         const form = document.getElementById('petForm');
@@ -415,7 +410,7 @@
         // Show error message
         function showError(message = 'Please fill in all required fields') {
             hideMessages();
-            errorMessage.textContent = `❌ ${message}`;
+            errorMessage.textContent = `⚠ ${message}`;
             errorMessage.style.display = 'block';
             setTimeout(() => {
                 errorMessage.style.display = 'none';
@@ -427,14 +422,15 @@
             e.preventDefault();
             
             // Get form data
-            const petName = document.getElementById('petName').value;
+            const petName = document.getElementById('petName').value.trim();
             const ownerName = document.getElementById('ownerName').value.trim();
             const petAge = parseInt(document.getElementById('petAge').value);
             const sex = document.querySelector('input[name="sex"]:checked')?.value;
-            const fixed = document.querySelector('input[name="fixed"]:checked')?.value === 'true';
+            const fixedValue = document.querySelector('input[name="fixed"]:checked')?.value;
+            const fixed = fixedValue === 'true';
 
             // Validate required fields
-            if (!petName || !ownerName || isNaN(petAge) || !sex || document.querySelector('input[name="fixed"]:checked') === null) {
+            if (!petName || !ownerName || isNaN(petAge) || !sex || fixedValue === null) {
                 showError();
                 return;
             }
@@ -456,32 +452,38 @@
                     owner: ownerName,
                     age: petAge,
                     sex: sex,
-                    fixed: fixed,
-                    active: false, // New pets start as inactive
-                    datecreated: Date.now()
+                    fixed: fixed
                 };
 
-                // Save to Firebase
-                await dogsRef.push(petProfile);
+                // Send POST request to server
+                const response = await fetch(`${API_BASE_URL}/pets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(petProfile)
+                });
 
-                // Show success message
-                showSuccess();
+                const data = await response.json();
 
-                // Reset form
-                form.reset();
+                if (response.ok) {
+                    // Success - show message and reset form
+                    showSuccess();
+                    form.reset();
+                } else {
+                    // Server returned an error
+                    throw new Error(data.error || 'Failed to create pet profile');
+                }
 
             } catch (error) {
                 console.error('Error creating pet profile:', error);
-                showError('Failed to create pet profile. Please try again.');
+                showError(error.message || 'Failed to create pet profile. Please try again.');
             } finally {
                 // Re-enable submit button
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Create Pet Profile';
             }
         });
-
-        // Navigation
-
     </script>
 </body>
 </html>

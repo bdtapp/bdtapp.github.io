@@ -49,7 +49,7 @@
 
         .nav-icons {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 8px;
             margin-bottom: 20px;
             padding: 0 8px;
@@ -489,6 +489,22 @@
             color: #ff6b6b;
         }
 
+        /* Loading indicator */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+        }
+
         /* Animations */
         .pet-item {
             animation: fadeInUp 0.4s ease both;
@@ -534,9 +550,9 @@
             }
 
             .nav-icon {
-                font-size: 24px;
-                min-width: 44px;
-                height: 44px;
+                font-size: 20px;
+                min-width: 40px;
+                height: 40px;
             }
 
             .counter {
@@ -547,6 +563,11 @@
                 padding: 24px;
                 margin: 10px;
                 max-width: none;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
             }
         }
     </style>
@@ -560,7 +581,7 @@
                 <a href="active.html" class="nav-icon" data-page="active">❤️</a>
                 <a href="inactive.html" class="nav-icon active" data-page="inactive">🚫</a>
                 <a href="rooms.html" class="nav-icon" data-page="rooms">🚪</a>
-                <a href="logs.html" class="nav-icon" data-page="logs">📝</a>
+                <a href="logs.html" class="nav-icon" data-page="logs">📄</a>
                 <a href="createnew.html" class="nav-icon" data-page="create">➕</a>
             </div>
             <div class="counter" id="counter"></div>
@@ -576,7 +597,7 @@
 
         <!-- Pet List -->
         <div class="pet-list" id="petList">
-            <!-- Pets will be rendered here -->
+            <div class="loading">Loading pets...</div>
         </div>
     </div>
 
@@ -648,57 +669,140 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="firebaseloader.js"></script>
     <script>
+        // API base URL - change this if your server runs on a different port or domain
+        const API_BASE_URL = 'http://localhost:3000/api';
 
-        firebase.initializeApp(firebaseConfig);
-        const dbkey = localStorage.getItem('dbpath');
-        const database = firebase.database();
-        const activeDogsRef = database.ref(`${dbkey}/Active`);
-        const inactiveDogsRef = database.ref(`${dbkey}/Inactive`);
-        const logsRef = database.ref(`${dbkey}/Logs`);
         let pets = [];
         let searchTerm = '';
         let currentEditingId = null;
         let debuglockon = false;
-        // Listen for changes in Firebase
-        inactiveDogsRef.on('value', (snapshot) => {
-            pets = [];
-            if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    const pet = {
-                        id: childSnapshot.key,
-                        ...childSnapshot.val()
-                    };
-                    pets.push(pet);
-                });
-            }
-            renderPets();
+
+        // Load pets on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPets();
+            setupDebugMode();
         });
 
-        function editEntry(id) {
-            if (debuglockon)
-                return;
-
-
-            currentEditingId = id;
-            // Fetch pet data from /key/internal/${id}
-            inactiveDogsRef.child(id).once('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    const petData = snapshot.val();
-                    populateEditForm(petData);
-                    openEditModal();
+        // Load pets from server
+        async function loadPets() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/pets`);
+                if (response.ok) {
+                    pets = await response.json();
+                    renderPets();
                 } else {
-                    showEditError('Pet data not found!');
+                    throw new Error('Failed to fetch pets');
                 }
-            }).catch((error) => {
-                console.error('Error fetching pet data:', error);
-                showEditError('Error loading pet data. Please try again.');
-            });
+            } catch (error) {
+                console.error('Error loading pets:', error);
+                document.getElementById('petList').innerHTML = `
+                    <div class="empty-state">
+                        Failed to load pets. Please check if the server is running.
+                    </div>
+                `;
+            }
         }
 
+        // Render pets list
+        function renderPets() {
+            let filtered = pets.filter(pet =>
+                (pet.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (pet.owner || '').toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+            const petList = document.getElementById('petList');
+
+            if (filtered.length === 0) {
+                petList.innerHTML = `
+                    <div class="empty-state">
+                        ${searchTerm ? 'No pets found matching your search.' : 'No pets found.'}
+                    </div>
+                `;
+                updateCounter();
+                return;
+            }
+
+            petList.innerHTML = filtered.map(pet => {
+                const classes = [
+                    'pet-item',
+                    pet.active ? 'active' : ''
+                ].filter(Boolean).join(' ');
+
+                return `
+                    <div class="${classes}">
+                        <div class="pet-info">
+                            <div class="pet-name">${pet.name || 'Unknown'}</div>
+                            <div class="pet-owner">${pet.owner || 'No Owner'}</div>
+                            <div class="pet-details">${pet.age || 'Unknown'} years • ${pet.sex === 'm' ? 'Male' : 'Female'} • ${pet.fixed ? 'Fixed' : 'Not Fixed'}</div>
+                        </div>
+                        
+                        <div class="actions">
+                            <button class="action-btn ${pet.active ? 'heart-active disabled' : ''}" ${pet.active ? 'onclick=""' : `onclick="toggleActive('${pet._id}')"`}>❤️</button>
+                            <button class="action-btn" onclick="editEntry('${pet._id}')">✏️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateCounter();
+        }
+
+        // Update counter display
+        function updateCounter() {
+            const active = pets.filter(p => p.active).length;
+            const total = pets.length;
+            document.getElementById('counter').textContent = `${active}/${total}`;
+        }
+
+        // Toggle pet active status
+        async function toggleActive(id) {
+            if (debuglockon) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/pets/${id}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ active: true })
+                });
+
+                if (response.ok) {
+                    const updatedPet = await response.json();
+                    // Update local pets array
+                    const petIndex = pets.findIndex(p => p._id === id);
+                    if (petIndex !== -1) {
+                        pets[petIndex] = updatedPet;
+                    }
+                    renderPets();
+                } else {
+                    const error = await response.json();
+                    console.error('Error toggling active status:', error);
+                    alert('Failed to update pet status. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error toggling active status:', error);
+                alert('Failed to update pet status. Please check your connection.');
+            }
+        }
+
+        // Edit entry
+        function editEntry(id) {
+            if (debuglockon) return;
+
+            currentEditingId = id;
+            const pet = pets.find(p => p._id === id);
+            if (pet) {
+                populateEditForm(pet);
+                openEditModal();
+            } else {
+                showEditError('Pet data not found!');
+            }
+        }
+
+        // Populate edit form with pet data
         function populateEditForm(petData) {
             document.getElementById('editName').value = petData.name || '';
             document.getElementById('editOwner').value = petData.owner || '';
@@ -716,6 +820,7 @@
             if (fixedRadio) fixedRadio.checked = true;
         }
 
+        // Modal functions
         function openEditModal() {
             document.getElementById('editModal').classList.add('show');
             document.body.style.overflow = 'hidden';
@@ -746,28 +851,30 @@
         function showEditError(message = 'Please fill in all required fields') {
             hideEditMessages();
             const errorMsg = document.getElementById('editErrorMessage');
-            errorMsg.textContent = `❌ ${message}`;
+            errorMsg.textContent = `⚠ ${message}`;
             errorMsg.style.display = 'block';
             setTimeout(() => {
                 errorMsg.style.display = 'none';
             }, 3000);
         }
 
-        function saveEditChanges() {
+        // Save edit changes
+        async function saveEditChanges() {
             if (!currentEditingId) {
                 showEditError('No pet selected for editing!');
                 return;
             }
 
             // Get form data
-            const petName = document.getElementById('editName').value;
+            const petName = document.getElementById('editName').value.trim();
             const ownerName = document.getElementById('editOwner').value.trim();
             const petAge = parseInt(document.getElementById('editAge').value);
             const sex = document.querySelector('input[name="editSex"]:checked')?.value;
-            const fixed = document.querySelector('input[name="editFixed"]:checked')?.value === 'true';
+            const fixedValue = document.querySelector('input[name="editFixed"]:checked')?.value;
+            const fixed = fixedValue === 'true';
 
             // Validate required fields
-            if (!petName || !ownerName || isNaN(petAge) || !sex || document.querySelector('input[name="editFixed"]:checked') === null) {
+            if (!petName || !ownerName || isNaN(petAge) || !sex || fixedValue === null) {
                 showEditError();
                 return;
             }
@@ -782,109 +889,49 @@
             saveBtn.disabled = true;
             saveBtn.textContent = 'Saving Changes...';
 
-            const updatedData = {
-                name: petName,
-                owner: ownerName,
-                age: petAge,
-                sex: sex,
-                fixed: fixed
-            };
+            try {
+                const updatedData = {
+                    name: petName,
+                    owner: ownerName,
+                    age: petAge,
+                    sex: sex,
+                    fixed: fixed
+                };
 
-            // Save to /key/internal/${id}
-            inactiveDogsRef.child(currentEditingId).update(updatedData)
-                .then(() => {
-                    console.log('Updated successfully!');
+                const response = await fetch(`${API_BASE_URL}/pets/${currentEditingId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (response.ok) {
+                    const updatedPet = await response.json();
+                    // Update local pets array
+                    const petIndex = pets.findIndex(p => p._id === currentEditingId);
+                    if (petIndex !== -1) {
+                        pets[petIndex] = updatedPet;
+                    }
+                    renderPets();
                     showEditSuccess();
                     setTimeout(() => {
                         closeEditModal();
                     }, 1500);
-                })
-                .catch((error) => {
-                    console.error('Error updating pet:', error);
-                    showEditError('Failed to save changes. Please try again.');
-                })
-                .finally(() => {
-                    saveBtn.disabled = false;
-                    saveBtn.textContent = 'Save Changes';
-                });
-        }
-
-        function renderPets() {
-            let filtered = pets.filter(pet =>
-                (pet.name || '').toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-
-            const petList = document.getElementById('petList');
-            petList.innerHTML = filtered.map(pet => {
-                const classes = [
-                    'pet-item',
-                    pet.active ? 'active' : ''
-                ].filter(Boolean).join(' ');
-
-                return `
-                    <div class="${classes}">
-                        <div class="pet-info">
-                            <div class="pet-name">${pet.name || 'Unknown'}</div>
-                            <div class="pet-owner">${pet.owner || 'No Owner'}</div>
-                            
-                        </div>
-                        
-                        <div class="actions">
-                            <button class="action-btn ${pet.active ? 'heart-active disabled' : ''}" ${pet.active ? 'onclick=""' : `onclick="toggleActive('${pet.id}')"`}>❤️</button>
-                            <button class="action-btn" onclick="editEntry('${pet.id}')">✏️</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            updateCounter();
-        }
-
-        function updateCounter() {
-            const active = pets.filter(p => p.active).length;
-            const total = pets.length;
-            document.getElementById('counter').textContent = `${active}/${total}`;
-        }
-
-        function toggleActive(id) {
-            if (debuglockon)
-                return;
-
-            const pet = pets.find(p => p.id === id);
-            if (pet && !pet.active) {
-                // First get the current count of active dogs
-                activeDogsRef.once('value', (snapshot) => {
-                    const currentActiveCount = snapshot.numChildren();
-                    const newActiveCount = currentActiveCount + 1;
-
-                    // Update the pet to active in the current location
-                    const updates = { active: true };
-                    inactiveDogsRef.child(id).update(updates);
-
-                    // Add the pet to the active collection
-                    activeDogsRef.child(id).update({
-                        name: pet.name,
-                        owner: pet.owner,
-                    });
-
-                    // Add entry to logs
-                    const logEntry = {
-                        timestamp: Date.now(),
-                        arrived: new Date().toISOString(),
-                        name: pet.name,
-                        owner: pet.owner,
-                        id: id,
-                        count: newActiveCount,
-                        active: true
-                    };
-
-                    const randomKey = logsRef.push().key;
-                    logsRef.child(randomKey).update(logEntry);
-                });
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to update pet');
+                }
+            } catch (error) {
+                console.error('Error updating pet:', error);
+                showEditError(error.message || 'Failed to save changes. Please try again.');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Changes';
             }
         }
 
+        // Search functionality
         function clearSearch() {
             document.getElementById('searchInput').value = '';
             searchTerm = '';
@@ -896,8 +943,10 @@
             searchTerm = e.target.value;
             if (searchTerm === 'toggledebugmodeon') {
                 localStorage.setItem('debugmode', 'true');
+                setupDebugMode();
             } else if (searchTerm === 'toggledebugmodeoff') {
                 localStorage.setItem('debugmode', 'false');
+                setupDebugMode();
             }
             renderPets();
         });
@@ -922,21 +971,24 @@
             }
         });
 
-        ////DEBUG
-        document.addEventListener("DOMContentLoaded", (event) => {
+        // Debug mode setup
+        function setupDebugMode() {
             const debugmode = localStorage.getItem('debugmode');
+            const navicons = document.getElementsByClassName('nav-icons')[0];
+
+            // Remove existing debug elements
+            const existingDebugLock = navicons.querySelector('.debug-lock');
+            if (existingDebugLock) {
+                navicons.removeChild(existingDebugLock);
+            }
+
             if (debugmode === "true") {
-                const navicons = document.getElementsByClassName('nav-icons')[0];
                 const debuglock = document.createElement('a');
-                const debugicon = document.createElement('a');
-                debugicon.classList.add('nav-icon');
-                debugicon.setAttribute('href', '#');
-                debugicon.innerText = '💀';
-                debuglock.classList.add('nav-icon');
+                debuglock.classList.add('nav-icon', 'debug-lock');
                 debuglock.innerText = '🔓';
                 debuglock.setAttribute('href', '#');
-                //navicons.appendChild(debugicon);
                 navicons.appendChild(debuglock);
+
                 debuglock.onclick = function () {
                     debuglockon = !debuglockon;
                     if (debuglockon) {
@@ -947,22 +999,14 @@
                         debuglock.innerText = '🔓';
                     }
                 }
-                debugicon.onclick = function () {
-                    localStorage.setItem('debugmode', 'false');
-                    localStorage.setItem('debuglock', 'false');
-                    debuglockon = false;
-                    navicons.removeChild(debugicon);
-                    navicons.removeChild(debuglock);
-                }
+
                 const isdebuglockon = localStorage.getItem('debuglock');
                 if (isdebuglockon === 'true') {
                     debuglockon = true;
                     debuglock.innerText = '🔒';
                 }
-            } else {
-
             }
-        });
+        }
     </script>
 </body>
 

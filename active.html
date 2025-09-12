@@ -279,6 +279,21 @@
             background: rgba(255, 107, 107, 0.3);
         }
 
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 16px;
+            opacity: 0.7;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            font-size: 16px;
+            color: #ff6b6b;
+        }
+
         /* Sort Toggle - removed */
 
         /* Animations */
@@ -346,10 +361,10 @@
                 <a href="active.html" class="nav-icon active" data-page="active">❤️</a>
                 <a href="inactive.html" class="nav-icon" data-page="inactive">🚫</a>
                 <a href="rooms.html" class="nav-icon" data-page="rooms">🚪</a>
-                <a href="logs.html" class="nav-icon" data-page="logs">📝</a>
+                <a href="logs.html" class="nav-icon" data-page="logs">📋</a>
                 <a href="createnew.html" class="nav-icon" data-page="create">➕</a>
             </div>
-            <div class="counter" id="counter" onclick="resetAll()">8/12</div>
+            <div class="counter" id="counter" onclick="resetAll()">0/0</div>
         </div>
 
         <!-- Search -->
@@ -362,48 +377,73 @@
 
         <!-- Pet List -->
         <div class="pet-list" id="petList">
-            <!-- Pets will be rendered here -->
+            <div class="loading">Loading active pets...</div>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="firebaseloader.js"></script>
     <script>
-        firebase.initializeApp(firebaseConfig);
-        const dbkey = localStorage.getItem('dbpath');
-        const database = firebase.database();
-        const dogsRef = database.ref(`${dbkey}/Active`);
-        const inactiveDogsRef = database.ref(`${dbkey}/Inactive`);
-        const logsRef = database.ref(`${dbkey}/Logs`);
         let pets = [];
         let sortByOwner = false;
         let searchTerm = '';
         let debuglockon = false;
-        // Listen for changes in Firebase
-        dogsRef.on('value', (snapshot) => {
-            pets = [];
-            if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    const pet = {
-                        id: childSnapshot.key,
-                        ...childSnapshot.val()
-                    };
-                    pets.push(pet);
-                });
+        const API_BASE_URL = 'http://localhost:3000/api';
+        // API functions
+        async function fetchActivePets() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/pets/active`);
+                if (!response.ok) throw new Error('Failed to fetch active pets');
+                const data = await response.json();
+                pets = data;
+                renderPets();
+            } catch (error) {
+                console.error('Error fetching active pets:', error);
+                document.getElementById('petList').innerHTML = '<div class="error">Failed to load active pets</div>';
             }
-            renderPets();
-        });
+        }
+
+        async function updateActivePet(id, updates) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/active-pets/${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updates)
+                });
+                if (!response.ok) throw new Error('Failed to update pet');
+                return await response.json();
+            } catch (error) {
+                console.error('Error updating pet:', error);
+                alert('Failed to update pet status');
+            }
+        }
+
+        async function deactivatePet(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/pets/${id}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ active: false })
+                });
+                if (!response.ok) throw new Error('Failed to deactivate pet');
+                return await response.json();
+            } catch (error) {
+                console.error('Error deactivating pet:', error);
+                alert('Failed to send pet home');
+            }
+        }
 
         function renderPets() {
+            // Auto-clear pets that are both fed and out
             pets.forEach(pet => {
                 if (pet.fed && pet.out && !pet.cleared) {
                     pet.cleared = true;
-                    // If you persist pets to localStorage or a backend,
-                    // call your save/update function here
-                    // savePets();
+                    updateActivePet(pet._id, { cleared: true });
                 }
             });
+
             let filtered = pets.filter(pet =>
                 (pet.name || '').toLowerCase().includes(searchTerm.toLowerCase())
             );
@@ -415,6 +455,13 @@
             }
 
             const petList = document.getElementById('petList');
+            
+            if (filtered.length === 0) {
+                petList.innerHTML = '<div class="loading">No active pets found</div>';
+                updateCounter();
+                return;
+            }
+
             petList.innerHTML = filtered.map(pet => {
                 const classes = [
                     'pet-item',
@@ -428,16 +475,16 @@
 
                 return `
                     <div class="${classes}">
-                        <div class="pet-info" onclick="toggleCleared('${pet.id}')">
+                        <div class="pet-info" onclick="toggleCleared('${pet._id}')">
                             <div class="pet-name">${pet.name || 'Unknown'}</div>
                             <div class="pet-owner">${pet.owner || 'No Owner'}</div>
                             ${pet.currentlyOut ? `<div class="pet-status">Out since ${timeOut}</div>` : ''}
                         </div>
                         
                         <div class="actions">
-                            <button class="action-btn ${pet.fed ? 'fed' : ''}" onclick="toggleFed('${pet.id}')">🍚</button>
-                            <button class="action-btn ${pet.out ? 'out' : ''}" onclick="toggleOut('${pet.id}')">💩</button>
-                            <button class="action-btn" onclick="removePet('${pet.id}')">🚫</button>
+                            <button class="action-btn ${pet.fed ? 'fed' : ''}" onclick="toggleFed('${pet._id}')" title="Toggle Fed">🍽</button>
+                            <button class="action-btn ${pet.out ? 'out' : ''}" onclick="toggleOut('${pet._id}')" title="Toggle Out">💩</button>
+                            <button class="action-btn" onclick="removePet('${pet._id}')" title="Send Home">🚫</button>
                         </div>
                     </div>
                 `;
@@ -452,88 +499,91 @@
             document.getElementById('counter').textContent = `${total - completed}/${total}`;
         }
 
-        function toggleCleared(id) {
-            if (debuglockon)
-                return;
-            const pet = pets.find(p => p.id === id);
+        async function toggleCleared(id) {
+            if (debuglockon) return;
+            
+            const pet = pets.find(p => p._id === id);
             if (pet) {
                 if (pet.currentlyOut) {
-                    // If currently out, bring them back in (clear timestamp and currentlyOut)
+                    // If currently out, bring them back in
                     const updates = {
-                        currentlyOut: false,
-                        currentlyouttimestamp: null
+                        currentlyOut: false
                     };
-                    dogsRef.child(id).update(updates);
+                    const updatedPet = await updateActivePet(id, updates);
+                    if (updatedPet) {
+                        Object.assign(pet, updatedPet);
+                        renderPets();
+                    }
                 } else {
                     // Normal cleared toggle when not currently out
                     const updates = { cleared: !pet.cleared };
-                    dogsRef.child(id).update(updates);
+                    const updatedPet = await updateActivePet(id, updates);
+                    if (updatedPet) {
+                        Object.assign(pet, updatedPet);
+                        renderPets();
+                    }
                 }
             }
         }
 
-        function toggleFed(id) {
-            if (debuglockon)
-                return;
-            const pet = pets.find(p => p.id === id);
+        async function toggleFed(id) {
+            if (debuglockon) return;
+            
+            const pet = pets.find(p => p._id === id);
             if (pet) {
                 const updates = { fed: !pet.fed };
-                dogsRef.child(id).update(updates);
+                const updatedPet = await updateActivePet(id, updates);
+                if (updatedPet) {
+                    Object.assign(pet, updatedPet);
+                    renderPets();
+                }
             }
         }
 
-        function toggleOut(id) {
-            if (debuglockon)
-                return;
-            const pet = pets.find(p => p.id === id);
+        async function toggleOut(id) {
+            if (debuglockon) return;
+            
+            const pet = pets.find(p => p._id === id);
             if (pet) {
                 const updates = {
                     out: !pet.out,
-                    currentlyOut: !pet.out,
-                    currentlyouttimestamp: !pet.out ? Date.now() : null
+                    currentlyOut: !pet.out
                 };
-                dogsRef.child(id).update(updates);
+                
+                // Add timestamp if going out, remove if coming back
+                if (!pet.out) {
+                    updates.currentlyouttimestamp = Date.now();
+                } else {
+                    updates.currentlyouttimestamp = null;
+                }
+
+                const updatedPet = await updateActivePet(id, updates);
+                if (updatedPet) {
+                    Object.assign(pet, updatedPet);
+                    renderPets();
+                }
             }
         }
 
-        function removePet(id) {
-            if (debuglockon)
-                return;
-            const pet = pets.find(p => p.id === id);
+        async function removePet(id) {
+            if (debuglockon) return;
+            
+            const pet = pets.find(p => p._id === id);
             if (pet && confirm(`Send ${pet.name} home?`)) {
-                // Get current count before removing
-                dogsRef.once('value', (snapshot) => {
-                    const currentActiveCount = snapshot.numChildren();
-                    const newActiveCount = Math.max(0, currentActiveCount - 1);
-
-                    // Remove from active collection
-                    dogsRef.child(id).remove();
-
-                    // Update in inactive collection to set active = false
-                    inactiveDogsRef.child(id).update({ active: false });
-
-                    // Add departure log entry
-                    const logEntry = {
-                        timestamp: Date.now(),
-                        departed: new Date().toISOString(),
-                        name: pet.name,
-                        owner: pet.owner,
-                        id: id,
-                        count: newActiveCount,
-                        active: false
-                    };
-
-                    const randomKey = logsRef.push().key;
-                    logsRef.child(randomKey).update(logEntry);
-                });
+                const result = await deactivatePet(id);
+                if (result) {
+                    // Remove from local pets array
+                    pets = pets.filter(p => p._id !== id);
+                    renderPets();
+                }
             }
         }
 
-        function resetAll() {
-            if (debuglockon)
-                return;
-            if (confirm('Reset all states?')) {
-                pets.forEach(pet => {
+        async function resetAll() {
+            if (debuglockon) return;
+            
+            if (confirm('Reset all states (fed, out, cleared) for all active pets?')) {
+                const promises = pets.map(pet => {
                     const updates = {
                         fed: false,
                         out: false,
@@ -541,14 +591,18 @@
                         currentlyOut: false,
                         currentlyouttimestamp: null
                     };
-                    dogsRef.child(pet.id).update(updates);
+                    return updateActivePet(pet._id, updates);
                 });
-            }
-        }
 
-        function toggleSort() {
-            sortByOwner = !sortByOwner;
-            renderPets();
+                try {
+                    await Promise.all(promises);
+                    // Refetch to get updated data
+                    await fetchActivePets();
+                } catch (error) {
+                    console.error('Error resetting pets:', error);
+                    alert('Failed to reset all pets');
+                }
+            }
         }
 
         function clearSearch() {
@@ -561,7 +615,7 @@
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchTerm = e.target.value;
             if (searchTerm === 'toggledebugmodeon') {
-                console.log('wow');
+                console.log('Debug mode enabled');
                 localStorage.setItem('debugmode', 'true');
             } else if (searchTerm === 'toggledebugmodeoff') {
                 localStorage.setItem('debugmode', 'false');
@@ -569,9 +623,14 @@
             renderPets();
         });
 
+        // Auto-refresh every 30 seconds
+        setInterval(fetchActivePets, 30000);
 
-        ////DEBUG
-        document.addEventListener("DOMContentLoaded", (event) => {
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchActivePets();
+
+            // Debug mode setup
             const debugmode = localStorage.getItem('debugmode');
             if (debugmode === "true") {
                 const navicons = document.getElementsByClassName('nav-icons')[0];
@@ -579,12 +638,12 @@
                 const debugicon = document.createElement('a');
                 debugicon.classList.add('nav-icon');
                 debugicon.setAttribute('href', '#');
-                debugicon.innerText = '💀';
+                debugicon.innerText = '👀';
                 debuglock.classList.add('nav-icon');
                 debuglock.innerText = '🔓';
                 debuglock.setAttribute('href', '#');
-                //navicons.appendChild(debugicon);
                 navicons.appendChild(debuglock);
+                
                 debuglock.onclick = function () {
                     debuglockon = !debuglockon;
                     if (debuglockon) {
@@ -595,6 +654,7 @@
                         debuglock.innerText = '🔓';
                     }
                 }
+                
                 debugicon.onclick = function () {
                     localStorage.setItem('debugmode', 'false');
                     localStorage.setItem('debuglock', 'false');
@@ -602,16 +662,14 @@
                     navicons.removeChild(debugicon);
                     navicons.removeChild(debuglock);
                 }
+                
                 const isdebuglockon = localStorage.getItem('debuglock');
                 if (isdebuglockon === 'true') {
                     debuglockon = true;
                     debuglock.innerText = '🔒';
                 }
-            } else {
-
             }
         });
-
     </script>
 </body>
 
