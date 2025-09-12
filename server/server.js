@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const { Server } = require('ws');
 const { createServer } = require('http');
+const { timeStamp } = require('console');
 
 const app = express();
 const server = createServer(app);
@@ -115,10 +116,37 @@ const activePetSchema = new mongoose.Schema({
         default: Date.now
     },
 });
-
+const logSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: false
+    },
+    owner: {
+        type: String,
+        required: true,
+        trim: false
+    },
+    key: {
+        type: String,
+        required: true,
+    },
+    active: {
+        type: Boolean,
+        required: true
+    },
+    timestamp: {
+        type: Date,
+        default: Date.now
+    },
+    count: {
+        type: Number,
+        required: true
+    }
+});
 const Pet = mongoose.model('Pet', petSchema);
 const ActivePet = mongoose.model('activepets', activePetSchema);
-
+const Log = mongoose.model('Logs', logSchema);
 // WebSocket connection handling
 wss.on('connection', (ws) => {
     console.log('Client connected');
@@ -142,6 +170,22 @@ wss.on('connection', (ws) => {
                 case 'getInactivePets':
                     const inactivePets = await Pet.find({}).sort({ datecreated: -1 });
                     ws.send(JSON.stringify({ action: 'inactivePetsData', data: inactivePets }));
+                    break;
+                    //test this can be removed if it doesnt work
+                case 'getLogs':
+                    try {
+                        const logs = await Log.find().sort({ timestamp: -1 }).limit(500);
+                        ws.send(JSON.stringify({
+                            action: 'logsData',
+                            data: logs
+                        }));
+                    } catch (error) {
+                        console.error('Error fetching logs:', error);
+                        ws.send(JSON.stringify({
+                            action: 'error',
+                            message: 'Failed to fetch logs'
+                        }));
+                    }
                     break;
 
                 case 'createPet':
@@ -247,6 +291,18 @@ wss.on('connection', (ws) => {
                         await ActivePet.findByIdAndDelete(petId);
                     }
 
+                    // Count active pets
+                    const activeCount = await Pet.countDocuments({ active: true });
+
+                    // Save log entry
+                    const logEntry = new Log({
+                        key: currentPet._id,
+                        name: currentPet.name,
+                        owner: currentPet.owner,
+                        active: active,
+                        count: activeCount
+                    });
+                    await logEntry.save();
                     // Broadcast to all clients
                     broadcast(JSON.stringify({ action: 'petStatusUpdated', data: statusUpdatedPet }));
                     break;
