@@ -22,8 +22,8 @@ mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection error:', err));
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
 // Pet Schema
 const petSchema = new mongoose.Schema({
@@ -102,6 +102,10 @@ const activePetSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    currentlyouttimestamp: {
+        type: Date,
+        default: null
+    },
     cleared: {
         type: Boolean,
         default: false
@@ -118,46 +122,46 @@ const ActivePet = mongoose.model('activepets', activePetSchema);
 // WebSocket connection handling
 wss.on('connection', (ws) => {
     console.log('Client connected');
-    
+
     ws.on('message', async (message) => {
         try {
             const data = JSON.parse(message);
             console.log('Received message:', data);
-            
+
             switch (data.action) {
                 case 'getPets':
                     const pets = await Pet.find().sort({ datecreated: -1 });
                     ws.send(JSON.stringify({ action: 'petsData', data: pets }));
                     break;
-                    
+
                 case 'getActivePets':
                     const activePets = await ActivePet.find().sort({ dateActivated: -1 });
                     ws.send(JSON.stringify({ action: 'activePetsData', data: activePets }));
                     break;
-                    
+
                 case 'getInactivePets':
-                    const inactivePets = await Pet.find({ }).sort({ datecreated: -1 });
+                    const inactivePets = await Pet.find({}).sort({ datecreated: -1 });
                     ws.send(JSON.stringify({ action: 'inactivePetsData', data: inactivePets }));
                     break;
-                    
+
                 case 'createPet':
                     const { name, owner, age, sex, fixed } = data;
-                    
+
                     if (!name || !owner || age === undefined || !sex || fixed === undefined) {
                         ws.send(JSON.stringify({ action: 'error', message: 'All fields are required' }));
                         return;
                     }
-                    
+
                     if (age < 0 || age > 30) {
                         ws.send(JSON.stringify({ action: 'error', message: 'Age must be between 0 and 30 years' }));
                         return;
                     }
-                    
+
                     if (!['m', 'f'].includes(sex)) {
                         ws.send(JSON.stringify({ action: 'error', message: 'Sex must be "m" or "f"' }));
                         return;
                     }
-                    
+
                     const newPet = new Pet({
                         name: name,
                         owner: owner,
@@ -166,57 +170,57 @@ wss.on('connection', (ws) => {
                         fixed: Boolean(fixed),
                         active: false
                     });
-                    
+
                     const savedPet = await newPet.save();
-                    
+
                     // Broadcast to all clients
                     broadcast(JSON.stringify({ action: 'petCreated', data: savedPet }));
                     break;
-                    
+
                 case 'updatePet':
                     const { id, updateData } = data;
-                    
+
                     if (!id || !updateData) {
                         ws.send(JSON.stringify({ action: 'error', message: 'ID and update data are required' }));
                         return;
                     }
-                    
+
                     const updatedPet = await Pet.findByIdAndUpdate(id, updateData, { new: true });
-                    
+
                     if (!updatedPet) {
                         ws.send(JSON.stringify({ action: 'error', message: 'Pet not found' }));
                         return;
                     }
-                    
+
                     // If the pet is active, update the active collection too
                     if (updatedPet.active) {
                         await ActivePet.findByIdAndUpdate(id, updateData, { new: true });
                     }
-                    
+
                     // Broadcast to all clients
                     broadcast(JSON.stringify({ action: 'petUpdated', data: updatedPet }));
                     break;
-                    
+
                 case 'updatePetStatus':
                     const { petId, active } = data;
-                    
+
                     if (!petId || active === undefined) {
                         ws.send(JSON.stringify({ action: 'error', message: 'Pet ID and status are required' }));
                         return;
                     }
-                    
+
                     const currentPet = await Pet.findById(petId);
                     if (!currentPet) {
                         ws.send(JSON.stringify({ action: 'error', message: 'Pet not found' }));
                         return;
                     }
-                    
+
                     const statusUpdatedPet = await Pet.findByIdAndUpdate(
                         petId,
                         { active: Boolean(active) },
                         { new: true }
                     );
-                    
+
                     if (active) {
                         const activePetData = {
                             _id: currentPet._id,
@@ -231,7 +235,7 @@ wss.on('connection', (ws) => {
                             cleared: false,
                             dateActivated: new Date()
                         };
-                        
+
                         const existingActivePet = await ActivePet.findById(petId);
                         if (existingActivePet) {
                             await ActivePet.findByIdAndUpdate(petId, activePetData);
@@ -242,42 +246,42 @@ wss.on('connection', (ws) => {
                     } else {
                         await ActivePet.findByIdAndDelete(petId);
                     }
-                    
+
                     // Broadcast to all clients
                     broadcast(JSON.stringify({ action: 'petStatusUpdated', data: statusUpdatedPet }));
                     break;
-                    
+
                 case 'deletePet':
                     const { deleteId } = data;
-                    
+
                     if (!deleteId) {
                         ws.send(JSON.stringify({ action: 'error', message: 'Pet ID is required' }));
                         return;
                     }
-                    
+
                     const deletedPet = await Pet.findByIdAndDelete(deleteId);
                     await ActivePet.findByIdAndDelete(deleteId);
-                    
+
                     if (!deletedPet) {
                         ws.send(JSON.stringify({ action: 'error', message: 'Pet not found' }));
                         return;
                     }
-                    
+
                     // Broadcast to all clients
                     broadcast(JSON.stringify({ action: 'petDeleted', data: { _id: deleteId } }));
                     break;
-                    
+
                 case 'updateActivePet':
                     const { activePetId, activeUpdates } = data;
-                    
+
                     if (!activePetId || !activeUpdates) {
                         ws.send(JSON.stringify({ action: 'error', message: 'Pet ID and updates are required' }));
                         return;
                     }
-                    
+
                     const allowedFields = ['out', 'fed', 'currentlyOut', 'cleared', 'currentlyouttimestamp'];
                     const filteredUpdate = {};
-                    
+
                     Object.keys(activeUpdates).forEach(key => {
                         if (allowedFields.includes(key)) {
                             if (key === 'currentlyouttimestamp') {
@@ -287,22 +291,22 @@ wss.on('connection', (ws) => {
                             }
                         }
                     });
-                    
+
                     const updatedActivePet = await ActivePet.findByIdAndUpdate(
                         activePetId,
                         filteredUpdate,
                         { new: true }
                     );
-                    
+
                     if (!updatedActivePet) {
                         ws.send(JSON.stringify({ action: 'error', message: 'Active pet not found' }));
                         return;
                     }
-                    
+
                     // Broadcast to all clients
                     broadcast(JSON.stringify({ action: 'activePetUpdated', data: updatedActivePet }));
                     break;
-                    
+
                 default:
                     ws.send(JSON.stringify({ action: 'error', message: 'Unknown action' }));
             }
@@ -311,7 +315,7 @@ wss.on('connection', (ws) => {
             ws.send(JSON.stringify({ action: 'error', message: 'Server error: ' + error.message }));
         }
     });
-    
+
     ws.on('close', () => {
         console.log('Client disconnected');
     });
