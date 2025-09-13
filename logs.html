@@ -5,8 +5,318 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boston Dogtor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* ... existing CSS styles ... */
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                        background:
+                linear-gradient(135deg,
+                    rgba(102, 126, 234, 0.98) 0%,
+                    rgba(118, 75, 162, 0.98) 100%),
+                url('/images/bg.jpg') no-repeat center/cover;
+            min-height: 100vh;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header with navigation */
+        .header {
+            padding: 20px 16px 16px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-icons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 0 8px;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            height: 44px;
+        }
+
+        .nav-icon:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-icon.active {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .counter {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 12px;
+        }
+
+        /* Search */
+        .search {
+            padding: 0 24px 24px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 16px 20px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Log List */
+        .log-list {
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 0 24px 24px;
+        }
+
+        .log-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .log-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .log-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .log-item {
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .log-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .log-item.arrived {
+            border-left: 4px solid #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .log-item.departed {
+            border-left: 4px solid #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .log-item.bulk {
+            border-left: 4px solid #f39c12;
+            background: rgba(243, 156, 18, 0.1);
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .log-action {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .log-action.arrived {
+            color: #4ecdc4;
+        }
+
+        .log-action.departed {
+            color: #ff6b6b;
+        }
+
+        .log-action.bulk {
+            color: #f39c12;
+        }
+
+        .log-time {
+            font-size: 12px;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        .log-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-pet-info {
+            flex: 1;
+        }
+
+        .log-pet-name {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .log-pet-owner {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .log-count {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .no-logs {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.7;
+            font-size: 16px;
+        }
+
+        /* Animations */
+        .log-item {
+            animation: fadeInUp 0.4s ease both;
+        }
+
+        .log-item:nth-child(1) { animation-delay: 0.05s; }
+        .log-item:nth-child(2) { animation-delay: 0.1s; }
+        .log-item:nth-child(3) { animation-delay: 0.15s; }
+        .log-item:nth-child(4) { animation-delay: 0.2s; }
+        .log-item:nth-child(5) { animation-delay: 0.25s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                max-width: none;
+            }
+            
+            .nav-icon {
+                font-size: 20px;
+                min-width: 40px;
+                height: 40px;
+            }
+            
+            .counter {
+                font-size: 28px;
+            }
+
+            .log-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .log-details {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .log-count {
+                align-self: flex-end;
+            }
+        }
     </style>
 </head>
 <body>
@@ -44,8 +354,8 @@
 
         // Initialize WebSocket connection
         function initWebSocket() {
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = `${protocol}//${window.location.host}`;
+
+            const wsUrl = `ws://${window.location.hostname}:3000`;
             
             ws = new WebSocket(wsUrl);
             
@@ -58,7 +368,7 @@
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 
-                if (data.action === 'getlogs') {
+                if (data.action === 'logsData') {
                     logs = data.data;
                     renderLogs();
                 } else if (data.action === 'error') {

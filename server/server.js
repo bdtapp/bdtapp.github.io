@@ -146,7 +146,7 @@ const logSchema = new mongoose.Schema({
 });
 const Pet = mongoose.model('Pet', petSchema);
 const ActivePet = mongoose.model('activepets', activePetSchema);
-const Log = mongoose.model('Logs', logSchema);
+const Logs = mongoose.model('Logs', logSchema);
 // WebSocket connection handling
 wss.on('connection', (ws) => {
     console.log('Client connected');
@@ -174,7 +174,7 @@ wss.on('connection', (ws) => {
                     //test this can be removed if it doesnt work
                 case 'getLogs':
                     try {
-                        const logs = await Log.find().sort({ timestamp: -1 }).limit(500);
+                        const logs = await Logs.find().sort({ timestamp: -1 }).limit(500);
                         ws.send(JSON.stringify({
                             action: 'logsData',
                             data: logs
@@ -288,14 +288,15 @@ wss.on('connection', (ws) => {
                             await newActivePet.save();
                         }
                     } else {
+                        // Remove from active pets collection first
                         await ActivePet.findByIdAndDelete(petId);
                     }
 
-                    // Count active pets
+                    // Count active pets AFTER the database operations are complete
                     const activeCount = await Pet.countDocuments({ active: true });
 
-                    // Save log entry
-                    const logEntry = new Log({
+                    // Save log entry with the correct count
+                    const logEntry = new Logs({
                         key: currentPet._id,
                         name: currentPet.name,
                         owner: currentPet.owner,
@@ -303,6 +304,7 @@ wss.on('connection', (ws) => {
                         count: activeCount
                     });
                     await logEntry.save();
+                    
                     // Broadcast to all clients
                     broadcast(JSON.stringify({ action: 'petStatusUpdated', data: statusUpdatedPet }));
                     break;
