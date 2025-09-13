@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boston Dogtor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -14,7 +15,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                        background:
+            background:
                 linear-gradient(135deg,
                     rgba(102, 126, 234, 0.98) 0%,
                     rgba(118, 75, 162, 0.98) 100%),
@@ -262,22 +263,54 @@
             font-size: 16px;
         }
 
+        /* Connection Status */
+        .connection-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e74c3c;
+            animation: pulse 2s infinite;
+        }
+
+        .connection-status.connected {
+            background: #2ecc71;
+            animation: none;
+        }
+
         /* Animations */
         .log-item {
             animation: fadeInUp 0.4s ease both;
         }
 
-        .log-item:nth-child(1) { animation-delay: 0.05s; }
-        .log-item:nth-child(2) { animation-delay: 0.1s; }
-        .log-item:nth-child(3) { animation-delay: 0.15s; }
-        .log-item:nth-child(4) { animation-delay: 0.2s; }
-        .log-item:nth-child(5) { animation-delay: 0.25s; }
+        .log-item:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .log-item:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .log-item:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .log-item:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .log-item:nth-child(5) {
+            animation-delay: 0.25s;
+        }
 
         @keyframes fadeInUp {
             from {
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -290,13 +323,13 @@
                 margin: 10px;
                 max-width: none;
             }
-            
+
             .nav-icon {
                 font-size: 20px;
                 min-width: 40px;
                 height: 40px;
             }
-            
+
             .counter {
                 font-size: 28px;
             }
@@ -319,8 +352,11 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
+        <!-- Connection Status Indicator -->
+        <div class="connection-status" id="connectionStatus"></div>
         <!-- Header -->
         <div class="header">
             <div class="nav-icons">
@@ -356,38 +392,46 @@
         function initWebSocket() {
 
             const wsUrl = `ws://${window.location.hostname}:3000`;
-            
+
             ws = new WebSocket(wsUrl);
-            
+
             ws.onopen = () => {
                 console.log('WebSocket connection established');
                 // Request logs once connected
                 ws.send(JSON.stringify({ action: 'getLogs' }));
+                updateConnectionStatus(true);
             };
-            
+            function updateConnectionStatus(connected) {
+                const statusEl = document.getElementById('connectionStatus');
+                if (connected) {
+                    statusEl.classList.add('connected');
+                } else {
+                    statusEl.classList.remove('connected');
+                }
+            }
+
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                
+
                 if (data.action === 'logsData') {
                     logs = data.data;
                     renderLogs();
                 } else if (data.action === 'error') {
                     console.error('Server error:', data.message);
-                    document.getElementById('logList').innerHTML = 
+                    document.getElementById('logList').innerHTML =
                         '<div class="no-logs">Error loading logs</div>';
                 }
             };
-            
+
             ws.onerror = (error) => {
                 console.error('WebSocket error:', error);
-                document.getElementById('logList').innerHTML = 
-                    '<div class="no-logs">Connection error</div>';
+                updateConnectionStatus(false);
             };
-            
+
             ws.onclose = () => {
                 console.log('WebSocket connection closed');
                 // Try to reconnect after 3 seconds
-                setTimeout(initWebSocket, 3000);
+                updateConnectionStatus(false);
             };
         }
 
@@ -401,7 +445,7 @@
             });
 
             const logList = document.getElementById('logList');
-            
+
             if (filtered.length === 0) {
                 logList.innerHTML = '<div class="no-logs">No logs found</div>';
                 return;
@@ -415,10 +459,10 @@
 
                 const formatTime = (timestamp) => {
                     if (!timestamp) return 'Unknown time';
-                    
+
                     // Handle both Date objects and string timestamps
                     const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
-                    
+
                     return date.toLocaleString('en-US', {
                         month: 'numeric',
                         day: 'numeric',
@@ -461,7 +505,7 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', () => {
             initWebSocket();
-            
+
             // Event listeners
             document.getElementById('searchInput').addEventListener('input', (e) => {
                 searchTerm = e.target.value;
@@ -470,4 +514,5 @@
         });
     </script>
 </body>
+
 </html>

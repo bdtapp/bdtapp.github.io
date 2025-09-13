@@ -490,30 +490,21 @@
         }
 
         /* Connection status */
+        /* Connection Status */
         .connection-status {
-            position: fixed;
+            position: absolute;
             top: 10px;
             right: 10px;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e74c3c;
+            animation: pulse 2s infinite;
         }
 
         .connection-status.connected {
-            background: rgba(46, 204, 113, 0.2);
-            color: #4ecdc4;
-            border: 1px solid rgba(46, 204, 113, 0.4);
-        }
-
-        .connection-status.disconnected {
-            background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
-            border: 1px solid rgba(255, 107, 107, 0.4);
+            background: #2ecc71;
+            animation: none;
         }
 
         .status-dot {
@@ -622,12 +613,10 @@
 </head>
 
 <body>
-    <div class="connection-status disconnected" id="connectionStatus">
-        <div class="status-dot"></div>
-        <span>Disconnected</span>
-    </div>
 
     <div class="container">
+        <!-- Connection Status Indicator -->
+        <div class="connection-status" id="connectionStatus"></div>
         <!-- Header -->
         <div class="header">
             <div class="nav-icons">
@@ -785,17 +774,14 @@
 
         // Update connection status UI
         function updateConnectionStatus(connected) {
-            const connectionStatus = document.getElementById('connectionStatus');
+            const statusEl = document.getElementById('connectionStatus');
             if (connected) {
-                connectionStatus.classList.remove('disconnected');
-                connectionStatus.classList.add('connected');
-                connectionStatus.innerHTML = '<div class="status-dot"></div><span>Connected</span>';
+                statusEl.classList.add('connected');
             } else {
-                connectionStatus.classList.remove('connected');
-                connectionStatus.classList.add('disconnected');
-                connectionStatus.innerHTML = '<div class="status-dot"></div><span>Disconnected</span>';
+                statusEl.classList.remove('connected');
             }
         }
+
 
         // Handle incoming WebSocket messages
         function handleWebSocketMessage(data) {
@@ -901,7 +887,7 @@
                         <div class="pet-info">
                             <div class="pet-name">${pet.name || 'Unknown'}</div>
                             <div class="pet-owner">${pet.owner || 'No Owner'}</div>
-                            <div class="pet-details">${pet.age || 'Unknown'} years • ${pet.sex === 'm' ? 'Male' : 'Female'} • ${pet.fixed ? 'Fixed' : 'Not Fixed'}</div>
+                           
                         </div>
                         
                         <div class="actions">
@@ -927,13 +913,11 @@
             if (debuglockon) return;
 
             const pet = pets.find(p => p._id === id);
-            if (pet && confirm(`Activate ${pet.name}? This will add them to the active pets list.`)) {
-                sendWebSocketMessage({
-                    action: 'updatePetStatus',
-                    petId: id,
-                    active: true
-                });
-            }
+            sendWebSocketMessage({
+                action: 'updatePetStatus',
+                petId: id,
+                active: true
+            });
         }
 
         // Edit entry
