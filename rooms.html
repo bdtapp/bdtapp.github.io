@@ -95,6 +95,29 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
+        /* Connection Status */
+        .connection-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e74c3c;
+            animation: pulse 2s infinite;
+        }
+
+        .connection-status.connected {
+            background: #2ecc71;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
         /* Room List */
         .room-list {
             padding: 24px;
@@ -451,6 +474,36 @@
             }
         }
 
+        /* Error/Success Messages */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            z-index: 2000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .message.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .message.error {
+            background: rgba(231, 76, 60, 0.9);
+            border: 1px solid rgba(231, 76, 60, 1);
+        }
+
+        .message.success {
+            background: rgba(46, 204, 113, 0.9);
+            border: 1px solid rgba(46, 204, 113, 1);
+        }
+
         /* Mobile */
         @media (max-width: 480px) {
             .container {
@@ -495,6 +548,9 @@
 </head>
 <body>
     <div class="container">
+        <!-- Connection Status Indicator -->
+        <div class="connection-status" id="connectionStatus"></div>
+        
         <!-- Header -->
         <div class="header">
             <div class="nav-icons">
@@ -546,68 +602,163 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="firebaseloader.js"></script>
+    <!-- Message container -->
+    <div class="message" id="messageContainer"></div>
+
     <script>
-        // Firebase configuration
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const dbkey = localStorage.getItem('dbpath');
-        const dogsRef = database.ref(`${dbkey}/Active`);
-        const roomsRef = database.ref(`${dbkey}/Rooms`);
-        
+        // WebSocket connection
+        let ws = null;
+        let reconnectInterval = null;
+        let rooms = [];
         let activeDogCount = 0;
-        let rooms = {};
-        let totalRoomCount = 0;
         let editingRoomId = null;
 
-        // Initialize rooms from Firebase
-        function initializeRooms() {
-            // Listen for changes in active dogs count
-            dogsRef.on('value', (snapshot) => {
-                activeDogCount = snapshot.numChildren() || 0;
-                console.log(activeDogCount);
-                updateTotalCounter();
-                renderRooms();
-            });
+        // WebSocket connection management
+        function connectWebSocket() {
+            const protocol = 'ws';
+            const wsUrl = 'ws://localhost:3000';
+            
+            ws = new WebSocket(wsUrl);
 
-            // Listen for changes in room data
-            roomsRef.on('value', (snapshot) => {
-                rooms = {};
-                totalRoomCount = 0;
-                if (snapshot.exists()) {
-                    const roomData = snapshot.val();
-                    
-                    // Get totalcount if it exists
-                    if (roomData.totalcount !== undefined) {
-                        totalRoomCount = roomData.totalcount;
-                    }
-                    
-                    // Get all rooms (excluding totalcount)
-                    Object.keys(roomData).forEach(roomId => {
-                        if (roomId !== 'totalcount') {
-                            rooms[roomId] = roomData[roomId];
-                        }
-                    });
+            ws.onopen = () => {
+                console.log('Connected to WebSocket');
+                updateConnectionStatus(true);
+                
+                // Request initial data
+                requestRooms();
+                requestActivePets();
+                
+                // Clear reconnect interval if it exists
+                if (reconnectInterval) {
+                    clearInterval(reconnectInterval);
+                    reconnectInterval = null;
                 }
-                renderRooms();
-            });
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+
+            ws.onclose = () => {
+                console.log('Disconnected from WebSocket');
+                updateConnectionStatus(false);
+                
+                // Attempt to reconnect
+                if (!reconnectInterval) {
+                    reconnectInterval = setInterval(() => {
+                        console.log('Attempting to reconnect...');
+                        connectWebSocket();
+                    }, 3000);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                updateConnectionStatus(false);
+            };
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            if (connected) {
+                statusEl.classList.add('connected');
+            } else {
+                statusEl.classList.remove('connected');
+            }
+        }
+
+        function handleWebSocketMessage(data) {
+            console.log('Received:', data);
+
+            switch (data.action) {
+                case 'roomsData':
+                    rooms = data.data || [];
+                    renderRooms();
+                    break;
+                
+                case 'roomCreated':
+                    rooms.push(data.data);
+                    renderRooms();
+                    showMessage('Room created successfully!', 'success');
+                    break;
+                
+                case 'roomUpdated':
+                    const updatedRoomIndex = rooms.findIndex(r => r._id === data.data._id);
+                    if (updatedRoomIndex !== -1) {
+                        rooms[updatedRoomIndex] = data.data;
+                        renderRooms();
+                    }
+                    break;
+                
+                case 'roomCountUpdated':
+                    const countUpdatedRoomIndex = rooms.findIndex(r => r._id === data.data._id);
+                    if (countUpdatedRoomIndex !== -1) {
+                        rooms[countUpdatedRoomIndex] = data.data;
+                        renderRooms();
+                    }
+                    break;
+                
+                case 'roomDeleted':
+                    rooms = rooms.filter(r => r._id !== data.data._id);
+                    renderRooms();
+                    showMessage('Room deleted successfully!', 'success');
+                    break;
+                
+                case 'activePetsData':
+                    activeDogCount = data.data ? data.data.length : 0;
+                    updateTotalCounter();
+                    renderRooms();
+                    break;
+                
+                case 'petStatusUpdated':
+                    // Re-request active pets to update count
+                    requestActivePets();
+                    break;
+                
+                case 'error':
+                    showMessage(data.message || 'An error occurred', 'error');
+                    break;
+            }
+        }
+
+        function sendWebSocketMessage(message) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify(message));
+            } else {
+                showMessage('Connection lost. Please wait...', 'error');
+            }
+        }
+
+        function requestRooms() {
+            sendWebSocketMessage({ action: 'getRooms' });
+        }
+
+        function requestActivePets() {
+            sendWebSocketMessage({ action: 'getActivePets' });
         }
 
         function renderRooms() {
             const roomList = document.getElementById('roomList');
             
-            roomList.innerHTML = Object.entries(rooms).map(([roomId, room], index) => {
+            if (!rooms.length) {
+                roomList.innerHTML = '<div style="text-align: center; padding: 40px; opacity: 0.6;">No rooms yet. Add one below!</div>';
+                updateTotalCounter();
+                return;
+            }
+
+            const totalRoomCount = rooms.reduce((sum, room) => sum + room.count, 0);
+
+            roomList.innerHTML = rooms.map((room, index) => {
                 const canIncrease = totalRoomCount < activeDogCount;
                 const canDecrease = room.count > 0;
                 
                 return `
                     <div class="room-item" style="animation-delay: ${(index + 1) * 0.05}s">
                         <div class="room-info">
-                            <div class="room-emoji" onclick="editRoomField('${roomId}', 'emoji')">${room.emoji}</div>
+                            <div class="room-emoji" onclick="editRoomField('${room._id}')">${room.emoji}</div>
                             <div class="room-details">
-                                <div class="room-name" onclick="editRoomField('${roomId}', 'name')">${room.name}</div>
+                                <div class="room-name" onclick="editRoomField('${room._id}')">${room.name}</div>
                             </div>
                         </div>
                         
@@ -615,13 +766,13 @@
                             <div class="room-count">${room.count}</div>
                             <div class="count-controls">
                                 <button class="count-btn plus ${canIncrease ? '' : 'disabled'}" 
-                                        onclick="adjustRoomCount('${roomId}', 1)"
+                                        onclick="adjustRoomCount('${room._id}', 1)"
                                         ${canIncrease ? '' : 'disabled'}>+</button>
                                 <button class="count-btn minus ${canDecrease ? '' : 'disabled'}" 
-                                        onclick="adjustRoomCount('${roomId}', -1)"
+                                        onclick="adjustRoomCount('${room._id}', -1)"
                                         ${canDecrease ? '' : 'disabled'}>−</button>
                             </div>
-                            <button class="delete-btn" onclick="deleteRoom('${roomId}')">🗑️</button>
+                            <button class="delete-btn" onclick="deleteRoom('${room._id}')">🗑️</button>
                         </div>
                     </div>
                 `;
@@ -630,33 +781,8 @@
             updateTotalCounter();
         }
 
-        function adjustRoomCount(roomId, delta) {
-            const room = rooms[roomId];
-            if (!room) return;
-
-            const newCount = room.count + delta;
-            const newTotalCount = totalRoomCount + delta;
-
-            // Validate the change
-            if (delta > 0 && totalRoomCount >= activeDogCount) return;
-            if (delta < 0 && room.count <= 0) return;
-            if (newCount < 0) return;
-
-            // Update local state immediately for responsiveness
-            rooms[roomId].count = newCount;
-            totalRoomCount = newTotalCount;
-
-            // Save to Firebase - update both the room count and totalcount
-            const updates = {};
-            updates[`${roomId}/count`] = newCount;
-            updates['totalcount'] = newTotalCount;
-            
-            roomsRef.update(updates);
-            
-            renderRooms();
-        }
-
         function updateTotalCounter() {
+            const totalRoomCount = rooms.reduce((sum, room) => sum + room.count, 0);
             document.getElementById('totalCounter').textContent = `${totalRoomCount}/${activeDogCount}`;
         }
 
@@ -665,58 +791,43 @@
             const name = document.getElementById('newRoomName').value.trim();
 
             if (!name) {
-                alert('Please enter a room name');
+                showMessage('Please enter a room name', 'error');
                 return;
             }
 
-            // Generate unique room ID
-            const roomId = `Room${name.replace(/\s+/g, '')}${Date.now()}`;
-
-            // Create new room object
-            const newRoom = {
+            sendWebSocketMessage({
+                action: 'createRoom',
                 name: name,
-                emoji: emoji,
-                count: 0
-            };
-
-            // Update local state immediately for responsiveness
-            rooms[roomId] = newRoom;
-
-            // Save to Firebase
-            roomsRef.child(roomId).set(newRoom);
+                emoji: emoji
+            });
 
             // Clear form
             document.getElementById('newRoomEmoji').value = '';
             document.getElementById('newRoomName').value = '';
+        }
 
-            renderRooms();
+        function adjustRoomCount(roomId, delta) {
+            sendWebSocketMessage({
+                action: 'updateRoomCount',
+                roomId: roomId,
+                delta: delta
+            });
         }
 
         function deleteRoom(roomId) {
-            const room = rooms[roomId];
+            const room = rooms.find(r => r._id === roomId);
             if (!room) return;
 
             if (confirm(`Delete "${room.name}"? This cannot be undone.`)) {
-                // Calculate new total count (subtract deleted room's count)
-                const newTotalCount = totalRoomCount - room.count;
-                
-                // Remove from local state
-                delete rooms[roomId];
-                totalRoomCount = newTotalCount;
-                
-                // Remove from Firebase and update totalcount
-                const updates = {};
-                updates[roomId] = null; // Remove the room
-                updates['totalcount'] = newTotalCount;
-                
-                roomsRef.update(updates);
-                
-                renderRooms();
+                sendWebSocketMessage({
+                    action: 'deleteRoom',
+                    roomId: roomId
+                });
             }
         }
 
-        function editRoomField(roomId, field) {
-            const room = rooms[roomId];
+        function editRoomField(roomId) {
+            const room = rooms.find(r => r._id === roomId);
             if (!room) return;
 
             editingRoomId = roomId;
@@ -731,41 +842,36 @@
         }
 
         function saveRoomEdit() {
-            if (!editingRoomId || !rooms[editingRoomId]) return;
+            if (!editingRoomId) return;
 
             const emoji = document.getElementById('editRoomEmoji').value.trim();
             const name = document.getElementById('editRoomName').value.trim();
 
             if (!name) {
-                alert('Please enter a room name');
+                showMessage('Please enter a room name', 'error');
                 return;
             }
 
-            // Update local state immediately
-            rooms[editingRoomId].emoji = emoji || '🏠';
-            rooms[editingRoomId].name = name;
-
-            // Update Firebase
-            roomsRef.child(editingRoomId).update({
-                emoji: emoji || '🏠',
-                name: name
+            sendWebSocketMessage({
+                action: 'updateRoom',
+                roomId: editingRoomId,
+                name: name,
+                emoji: emoji || '🏠'
             });
 
             closeEditModal();
-            renderRooms();
         }
 
-        function resetAllRooms() {
-            if (confirm('Reset all room counts to 0?')) {
-                Object.keys(rooms).forEach(roomId => {
-                    rooms[roomId].count = 0;
-                });
-                saveRoomsToStorage();
-                renderRooms();
-            }
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('messageContainer');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            messageEl.classList.add('show');
+
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 3000);
         }
-
-
 
         // Close modal when clicking outside
         document.getElementById('editModal').addEventListener('click', (e) => {
@@ -774,9 +880,21 @@
             }
         });
 
-        // Initialize the app
-        initializeRooms();
+        // Handle form submissions
+        document.getElementById('newRoomName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addNewRoom();
+            }
+        });
 
+        document.getElementById('editRoomName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                saveRoomEdit();
+            }
+        });
+
+        // Initialize the app
+        connectWebSocket();
     </script>
 </body>
 </html>

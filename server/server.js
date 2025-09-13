@@ -116,6 +116,7 @@ const activePetSchema = new mongoose.Schema({
         default: Date.now
     },
 });
+
 const logSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -144,9 +145,37 @@ const logSchema = new mongoose.Schema({
         required: true
     }
 });
+
+// Room Schema
+const roomSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 20
+    },
+    emoji: {
+        type: String,
+        required: true,
+        default: '🏠'
+    },
+    count: {
+        type: Number,
+        required: true,
+        default: 0,
+        min: 0
+    },
+    dateCreated: {
+        type: Date,
+        default: Date.now
+    }
+});
+
 const Pet = mongoose.model('Pet', petSchema);
 const ActivePet = mongoose.model('activepets', activePetSchema);
 const Logs = mongoose.model('Logs', logSchema);
+const Room = mongoose.model('Room', roomSchema);
+
 // WebSocket connection handling
 wss.on('connection', (ws) => {
     console.log('Client connected');
@@ -171,7 +200,7 @@ wss.on('connection', (ws) => {
                     const inactivePets = await Pet.find({}).sort({ datecreated: -1 });
                     ws.send(JSON.stringify({ action: 'inactivePetsData', data: inactivePets }));
                     break;
-                    //test this can be removed if it doesnt work
+
                 case 'getLogs':
                     try {
                         const logs = await Logs.find().sort({ timestamp: -1 }).limit(500);
@@ -184,6 +213,219 @@ wss.on('connection', (ws) => {
                         ws.send(JSON.stringify({
                             action: 'error',
                             message: 'Failed to fetch logs'
+                        }));
+                    }
+                    break;
+
+                // Room-related actions
+                case 'getRooms':
+                    try {
+                        const rooms = await Room.find().sort({ dateCreated: 1 });
+                        ws.send(JSON.stringify({
+                            action: 'roomsData',
+                            data: rooms
+                        }));
+                    } catch (error) {
+                        console.error('Error fetching rooms:', error);
+                        ws.send(JSON.stringify({
+                            action: 'error',
+                            message: 'Failed to fetch rooms'
+                        }));
+                    }
+                    break;
+
+                case 'createRoom':
+                    try {
+                        const { name, emoji } = data;
+
+                        if (!name || !name.trim()) {
+                            ws.send(JSON.stringify({
+                                action: 'error',
+                                message: 'Room name is required'
+                            }));
+                            return;
+                        }
+
+                        // Check if room with same name already exists
+                        const existingRoom = await Room.findOne({ 
+                            name: name.trim().toLowerCase() 
+                        });
+
+                        if (existingRoom) {
+                            ws.send(JSON.stringify({
+                                action: 'error',
+                                message: 'A room with this name already exists'
+                            }));
+                            return;
+                        }
+
+                        const newRoom = new Room({
+                            name: name.trim(),
+                            emoji: emoji || '🏠',
+                            count: 0
+                        });
+
+                        const savedRoom = await newRoom.save();
+
+                        // Broadcast to all clients
+                        broadcast(JSON.stringify({
+                            action: 'roomCreated',
+                            data: savedRoom
+                        }));
+
+                    } catch (error) {
+                        console.error('Error creating room:', error);
+                        ws.send(JSON.stringify({
+                            action: 'error',
+                            message: 'Failed to create room'
+                        }));
+                    }
+                    break;
+
+                case 'updateRoom':
+                    try {
+                        const { roomId, name, emoji } = data;
+
+                        if (!roomId) {
+                            ws.send(JSON.stringify({
+                                action: 'error',
+                                message: 'Room ID is required'
+                            }));
+                            return;
+                        }
+
+                        const updateData = {};
+                        if (name !== undefined) updateData.name = name.trim();
+                        if (emoji !== undefined) updateData.emoji = emoji;
+
+                        const updatedRoom = await Room.findByIdAndUpdate(
+                            roomId,
+                            updateData,
+                            { new: true }
+                        );
+
+                        if (!updatedRoom) {
+                            ws.send(JSON.stringify({
+                                action: 'error',
+                                message: 'Room not found'
+                            }));
+                            return;
+                        }
+
+                        // Broadcast to all clients
+                        broadcast(JSON.stringify({
+                            action: 'roomUpdated',
+                            data: updatedRoom
+                        }));
+
+                    } catch (error) {
+                        console.error('Error updating room:', error);
+                        ws.send(JSON.stringify({
+                            action: 'error',
+                            message: 'Failed to update room'
+                        }));
+                    }
+                    break;
+
+                case 'updateRoomCount':
+                    try {
+                        const { roomId, delta } = data;
+
+                        if (!roomId || delta === undefined) {
+                            ws.send(JSON.stringify({
+                                action: 'error',
+                                message: 'Room ID and count delta are required'
+                            }));
+                            return;
+                        }
+
+                        const room = await Room.findById(roomId);
+                        if (!room) {
+                            ws.send(JSON.stringify({
+                                action: 'error',
+                                message: 'Room not found'
+                            }));
+                            return;
+                        }
+
+                        const newCount = room.count + delta;
+
+                        // Validate the change
+                        if (newCount < 0) {
+                            ws.send(JSON.stringify({
+                                action: 'error',
+                                message: 'Room count cannot be negative'
+                            }));
+                            return;
+                        }
+
+                        // Check total room count against active pets
+                        const activeCount = await Pet.countDocuments({ active: true });
+                        const allRooms = await Room.find();
+                        const totalRoomCount = allRooms.reduce((sum, r) => sum + r.count, 0) - room.count + newCount;
+
+                        if (totalRoomCount > activeCount) {
+                            ws.send(JSON.stringify({
+                                action: 'error',
+                                message: 'Total room count cannot exceed active pets count'
+                            }));
+                            return;
+                        }
+
+                        const updatedRoom = await Room.findByIdAndUpdate(
+                            roomId,
+                            { count: newCount },
+                            { new: true }
+                        );
+
+                        // Broadcast to all clients
+                        broadcast(JSON.stringify({
+                            action: 'roomCountUpdated',
+                            data: updatedRoom
+                        }));
+
+                    } catch (error) {
+                        console.error('Error updating room count:', error);
+                        ws.send(JSON.stringify({
+                            action: 'error',
+                            message: 'Failed to update room count'
+                        }));
+                    }
+                    break;
+
+                case 'deleteRoom':
+                    try {
+                        const { roomId } = data;
+
+                        if (!roomId) {
+                            ws.send(JSON.stringify({
+                                action: 'error',
+                                message: 'Room ID is required'
+                            }));
+                            return;
+                        }
+
+                        const deletedRoom = await Room.findByIdAndDelete(roomId);
+
+                        if (!deletedRoom) {
+                            ws.send(JSON.stringify({
+                                action: 'error',
+                                message: 'Room not found'
+                            }));
+                            return;
+                        }
+
+                        // Broadcast to all clients
+                        broadcast(JSON.stringify({
+                            action: 'roomDeleted',
+                            data: { _id: roomId }
+                        }));
+
+                    } catch (error) {
+                        console.error('Error deleting room:', error);
+                        ws.send(JSON.stringify({
+                            action: 'error',
+                            message: 'Failed to delete room'
                         }));
                     }
                     break;
